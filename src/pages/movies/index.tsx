@@ -1,44 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { Paper, InputBase, InputAdornment, Typography, Button, Grid } from "@mui/material";
+import {
+  Paper,
+  InputBase,
+  InputAdornment,
+  Typography,
+  Button,
+  Grid,
+  Box,
+  BoxProps,
+  List,
+  ListItem,
+  Avatar,
+  Card,
+  CardContent,
+  CardMedia,
+  Tabs,
+  Tab,
+} from "@mui/material";
 import SearchIcon from "../../assets/icons/icon-search.svg";
-import Sidebar from "../../components/sidebar";
-import Box, { BoxProps } from "@mui/material/Box";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import SidebarRight from "../../components/sidebar/sidebarRight";
-
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
-import ImageIcon from "@mui/icons-material/Image";
-import WorkIcon from "@mui/icons-material/Work";
-import BeachAccessIcon from "@mui/icons-material/BeachAccess";
-
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import IconButton from "@mui/material/IconButton";
-import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
-import SkipNextIcon from "@mui/icons-material/SkipNext";
-
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-
-import Dialog, { DialogProps } from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 
 import { Link, useLocation, useParams } from "react-router-dom";
 
 import EmptyBackDrop from "../../assets/images/emptyBackdrop.jpg";
+import { homeIcon, movieIcon, tvSeriesIcon, bookmarkIcon } from "../../assets";
 
-import homeIcon from "../../assets/icons/icon-nav-home.svg";
-import movieIcon from "../../assets/icons/icon-nav-movies.svg";
-import tvSeriesIcon from "../../assets/icons/icon-nav-tv-series.svg";
-import bookmarkIcon from "../../assets/icons/icon-nav-bookmark.svg";
 import axios from "axios";
 import {
   GenresData,
@@ -192,7 +178,7 @@ const NumberCircle: React.FC<NumberCircleProps> = ({ number }) => {
           fontFamily: "Arial, sans-serif",
           zIndex: 1,
         }}>
-        {roundedNumber}
+        {roundedNumber.toFixed(1)}
       </Box>
     </Box>
   );
@@ -432,9 +418,7 @@ const MovieDetails = () => {
                   }}>
                   <Box>
                     <Typography>Rating</Typography>
-                    {/* <NumberCircle number={parseFloat(detailsMovie.vote_average).toFixed(1)} /> */}
                     <NumberCircle number={parseFloat(detailsMovie.vote_average)} />
-                    {/* <Button variant="outlined">{parseFloat(detailsMovie.vote_average).toFixed(1)}</Button> */}
                   </Box>
                   <Box>
                     <Typography>EP Length</Typography>

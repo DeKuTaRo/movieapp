@@ -1,28 +1,41 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Paper, InputBase, InputAdornment, Typography, Button, Grid, Slider } from "@mui/material";
+import React, { useEffect, useState, useCallback, useRef, SyntheticEvent } from "react";
+import {
+  Paper,
+  InputBase,
+  InputAdornment,
+  Typography,
+  Button,
+  Grid,
+  Slider,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Box,
+  BoxProps,
+  Card,
+  CardContent,
+  Collapse,
+  Tabs,
+  Tab,
+} from "@mui/material";
 import SearchIcon from "../../assets/icons/icon-search.svg";
-import Box, { BoxProps } from "@mui/material/Box";
 
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Collapse from "@mui/material/Collapse";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-
-import { Link, useLocation, useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { homeIcon, movieIcon, tvSeriesIcon, bookmarkIcon, arrowDownIcon, exploreIcon } from "../../assets";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { homeIcon, movieIcon, tvSeriesIcon, bookmarkIcon, exploreIcon } from "../../assets";
 
 import axios from "axios";
 import { GenresData, MovieDataType, TVDataType } from "../../assets/data";
 
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs, { Dayjs } from "dayjs";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+
 const MovieItem: React.FC<{ movie: any }> = ({ movie }) => (
   <Item>
-    <Paper elevation={0} sx={{ backgroundColor: "transparent" }}>
-      <Card variant="outlined" sx={{ bgcolor: "transparent", color: "#E0E0E0", my: 3, border: "none" }}>
+    <Paper elevation={0} sx={{ backgroundColor: "transparent", margin: 0 }}>
+      <Card variant="outlined" sx={{ bgcolor: "transparent", color: "#E0E0E0", border: "none" }}>
         <CardContent sx={{ p: 0, position: "relative" }}>
           <img
             src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
@@ -44,7 +57,7 @@ const MovieItem: React.FC<{ movie: any }> = ({ movie }) => (
               fontWeight: "bold",
               fontSize: "15px",
             }}>
-            {movie.vote_average}
+            {parseFloat(movie.vote_average).toFixed(1)}
           </Typography>
         </CardContent>
       </Card>
@@ -129,10 +142,17 @@ const minDistance = 20;
 const Explore = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [sortBy, setSortBy] = useState<string>("");
+
+  const defaultSortBy = "popularity.desc";
+  const defaultRunTime = [0, 200];
+  const [sortBy, setSortBy] = useState<string>(defaultSortBy);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [page, setPage] = useState(1);
-  const [runTime, setRunTime] = useState<number[]>([0, 200]);
+  const [runTime, setRunTime] = useState<number[]>(defaultRunTime);
+  const [runTimeUpdateURL, setRunTimeUpdateURL] = useState<number[]>(defaultRunTime);
+  const [selectedFromDate, setSelectedFromDate] = useState<Dayjs | null>(null);
+  const [selectedToDate, setSelectedToDate] = useState<Dayjs | null>(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const [listsMovieSearch, setListsMovieSearch] = React.useState<MovieDataType[]>([]);
   const [listsTVShowSearch, setListsTVShowSearch] = React.useState<TVDataType[]>([]);
@@ -153,13 +173,6 @@ const Explore = () => {
     },
     [loading, hasMore]
   );
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const genreParams = searchParams.getAll("genre");
-    setSelectedGenres(genreParams.map(Number));
-    setSortBy(searchParams.get("sort_by") || "popularity.desc");
-  }, [location.search]);
 
   useEffect(() => {
     setListsMovieSearch([]);
@@ -185,8 +198,10 @@ const Explore = () => {
               page: page,
               sort_by: sortBy,
               with_genres: selectedGenres.toString(),
-              // "with_runtime.gte": runTime[0],
-              // "with_runtime.lte": runTime[1],
+              "with_runtime.gte": runTime[0],
+              "with_runtime.lte": runTime[1],
+              "primary_release_date.gte": selectedFromDate,
+              "primary_release_date.lte": selectedToDate,
             },
             headers,
           }),
@@ -208,7 +223,7 @@ const Explore = () => {
         setListsTVShowSearch((prevMovies) =>
           page === 1 ? response2.data.results : [...prevMovies, ...response2.data.results]
         );
-        setHasMore(response2.data.results.length > 0);
+        setHasMore(response1.data.results.length > 0);
         setLoading(false);
       } catch (err) {
         console.log("error: ", err);
@@ -216,9 +231,7 @@ const Explore = () => {
       }
     };
     fetchDetails();
-  }, [sortBy, selectedGenres, page, runTime]);
-
-  const { pathname } = useLocation();
+  }, [sortBy, selectedGenres, page, runTime, selectedFromDate, selectedToDate]);
 
   const [typeFilms, setTypeFilms] = React.useState(0);
   const handleChange = async (event: React.SyntheticEvent, newValue: number) => {
@@ -227,58 +240,82 @@ const Explore = () => {
   const [filterCollapse, setFilterCollapse] = React.useState(true);
   const [sortCollapse, setSortCollapse] = React.useState(true);
 
-  const handleFilterCollapse = (type: string) => {
-    if (type === "sortCollapse") {
-      setSortCollapse((prev) => !prev);
-    } else {
-      setFilterCollapse((prev) => !prev);
-    }
-  };
-
   const handleChangeSortSearch = (event: SelectChangeEvent) => {
-    const newSortBy = event.target.value;
-    setSortBy(newSortBy);
-    updateURL(selectedGenres, newSortBy, runTime);
+    const updatedSortedby = event.target.value;
+    setSortBy(updatedSortedby);
+    setIsInitialLoad(false);
   };
   const handleChangeGenresSearch = (genreId: number) => {
     setSelectedGenres((prev) => {
       const updatedGenres = prev.includes(genreId) ? prev.filter((id) => id !== genreId) : [...prev, genreId];
-      updateURL(updatedGenres, sortBy, runTime);
       return updatedGenres;
     });
+    setIsInitialLoad(false);
   };
-
   const handleChangeRunTimeSearch = (event: Event, newValue: number | number[], activeThumb: number) => {
     if (!Array.isArray(newValue)) {
       return;
     }
+    let updatedRunTime: number[];
     if (activeThumb === 0) {
-      setRunTime([Math.min(newValue[0], runTime[1] - minDistance), runTime[1]]);
+      updatedRunTime = [Math.min(newValue[0], runTime[1] - minDistance), runTime[1]];
     } else {
-      setRunTime([runTime[0], Math.max(newValue[1], runTime[0] + minDistance)]);
+      updatedRunTime = [runTime[0], Math.max(newValue[1], runTime[0] + minDistance)];
     }
-    setRunTime(newValue as number[]);
-    updateURL(selectedGenres, sortBy, newValue);
+    setRunTime(updatedRunTime);
+    setIsInitialLoad(false);
+  };
+  const handleChangeCommitted = (event: Event | SyntheticEvent<Element, Event>, newValue: number | number[]) => {
+    if (!Array.isArray(newValue)) {
+      return;
+    }
+    setRunTimeUpdateURL(newValue as number[]);
+    setIsInitialLoad(false);
+  };
+  const handleFromDateChange = (newValue: dayjs.Dayjs | null) => {
+    setSelectedFromDate(newValue);
+    setIsInitialLoad(false);
+  };
+  const handleToDateChange = (newValue: Dayjs | null) => {
+    setSelectedToDate(newValue);
+    setIsInitialLoad(false);
   };
 
-  const updateURL = (updatedGenres: number[], updatedSortBy: string, updatedRunTime: number[] | number) => {
+  useEffect(() => {
+    if (isInitialLoad) return;
     const searchParams = new URLSearchParams();
-    console.log("updatedRunTime = ", updatedRunTime);
-    // console.log("updatedRunTime.length > 1 = ", updatedRunTime.length > 1);
 
-    updatedGenres.forEach((id) => searchParams.append("genre", id.toString()));
-    searchParams.set("sort_by", updatedSortBy);
-    // searchParams.set("minRuntime", updatedRunTime.length > 1 && updatedRunTime[0].toString());
-    // searchParams.set("maxRuntime", updatedRunTime[1].toString());
-    navigate(`/explore?${searchParams.toString()}`);
-  };
+    if (sortBy !== defaultSortBy) {
+      searchParams.set("sort_by", sortBy);
+    }
+
+    selectedGenres.forEach((genre) => searchParams.append("genre", genre.toString()));
+
+    if (runTimeUpdateURL[0] !== defaultRunTime[0]) {
+      searchParams.set("minRuntime", runTimeUpdateURL[0].toString());
+    }
+
+    if (runTimeUpdateURL[1] !== defaultRunTime[1]) {
+      searchParams.set("maxRuntime", runTimeUpdateURL[1].toString());
+    }
+
+    if (selectedFromDate) {
+      searchParams.set("from", selectedFromDate.format("YYYY-MM-DD"));
+    }
+
+    if (selectedToDate) {
+      searchParams.set("to", selectedToDate.format("YYYY-MM-DD"));
+    }
+
+    const search = searchParams.toString();
+    navigate(search ? `/explore?${search}` : "/explore", { replace: true });
+  }, [sortBy, selectedGenres, runTimeUpdateURL, selectedFromDate, selectedToDate]);
 
   const genresMovieLocal: string | null = localStorage.getItem("genresMovieData");
   const genresMovieData: GenresData[] = genresMovieLocal !== null && JSON.parse(genresMovieLocal);
 
   const genresTVLocal: string | null = localStorage.getItem("genresTVData");
   const genresTVData: GenresData[] = genresTVLocal !== null && JSON.parse(genresTVLocal);
-  // console.log("listsTVShowSearch = ", listsTVShowSearch);
   return (
     <>
       <Box
@@ -292,7 +329,8 @@ const Explore = () => {
           color: "white",
           gap: 2,
           height: "100vh",
-          overflowY: "hidden",
+          overflowY: "scroll",
+          overflowX: "hidden",
         }}>
         <Box
           sx={{
@@ -337,7 +375,7 @@ const Explore = () => {
                     style={{
                       width: "18px",
                       filter: `${
-                        pathname === item.link
+                        location.pathname === item.link
                           ? "invert(58%) sepia(14%) saturate(3166%) hue-rotate(215deg) brightness(91%) contrast(87%)"
                           : "invert(84%)"
                       }`,
@@ -349,7 +387,7 @@ const Explore = () => {
           </Box>
         </Box>
 
-        <Box sx={{ width: "100%", overflowY: "scroll", padding: "2rem" }}>
+        <Box sx={{ width: "100%", padding: "2rem" }}>
           <Box sx={{ display: "flex" }}>
             <Typography variant="h3" sx={{ width: "75%" }}>
               Find films that best fit to you
@@ -378,7 +416,7 @@ const Explore = () => {
             </Tabs>
           </Box>
           <CustomTabPanel value={typeFilms} index={0}>
-            <Grid container spacing={2} columns={15}>
+            <Grid container spacing={1} columns={15}>
               {listsMovieSearch.map((movie, index) => (
                 <Grid
                   item
@@ -392,7 +430,7 @@ const Explore = () => {
           </CustomTabPanel>
           <CustomTabPanel value={typeFilms} index={1}>
             <div>TV series</div>
-            <Grid container spacing={2} columns={15}>
+            <Grid container spacing={1} columns={15}>
               {listsTVShowSearch.map((movie, index) => (
                 <Grid
                   item
@@ -409,9 +447,6 @@ const Explore = () => {
         {/* Sidebar Right */}
         <Box
           sx={{
-            backgroundColor: "#161d2f",
-            padding: 2,
-            borderRadius: 2,
             display: "flex",
             flexDirection: {
               xs: "row",
@@ -420,46 +455,46 @@ const Explore = () => {
             gap: 2,
             width: {
               sm: "100%",
-              lg: 550,
+              lg: 450,
             },
-            overflowY: "scroll",
+            mt: 4,
+            mr: 4,
           }}>
           {/* Sort */}
-          <Box sx={{ width: "100%" }}>
+          <Box sx={{ backgroundColor: "#161d2f", padding: 2, borderRadius: 2 }}>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <h2>Sort</h2>
               <Button
-                startIcon={<img src={arrowDownIcon} alt="filter" />}
+                startIcon={<KeyboardArrowDownIcon />}
                 sx={{ color: "white" }}
-                onClick={() => handleFilterCollapse("sortCollapse")}
+                onClick={() => setSortCollapse((prev) => !prev)}
               />
             </Box>
             {/* Sort collapse */}
             <Collapse in={sortCollapse}>
               <h2>Sort results by</h2>
-              <FormControl fullWidth sx={{ backgroundColor: "#49494b" }}>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  onChange={handleChangeSortSearch}
-                  sx={{ color: "white" }}
-                  defaultValue="popularity.desc">
-                  <MenuItem value="popularity.desc">Most popular</MenuItem>
-                  <MenuItem value="vote_average.desc">Most rating</MenuItem>
-                  <MenuItem value="release_date.desc">Most recent</MenuItem>
-                </Select>
-              </FormControl>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                fullWidth
+                onChange={handleChangeSortSearch}
+                sx={{ color: "white", backgroundColor: "#49494b", borderRadius: 2 }}
+                defaultValue="popularity.desc">
+                <MenuItem value="popularity.desc">Most popular</MenuItem>
+                <MenuItem value="vote_average.desc">Most rating</MenuItem>
+                <MenuItem value="release_date.desc">Most recent</MenuItem>
+              </Select>
             </Collapse>
           </Box>
 
           {/* Filter */}
-          <Box>
+          <Box sx={{ backgroundColor: "#161d2f", padding: 2, borderRadius: 2 }}>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <h2>Filter</h2>
               <Button
-                startIcon={<img src={arrowDownIcon} alt="filter" />}
+                startIcon={<KeyboardArrowDownIcon />}
                 sx={{ color: "white" }}
-                onClick={() => handleFilterCollapse("filterCollapse")}
+                onClick={() => setFilterCollapse((prev) => !prev)}
               />
             </Box>
 
@@ -481,11 +516,11 @@ const Explore = () => {
                         <Typography
                           key={genre.id}
                           sx={{
-                            backgroundColor: selectedGenres.includes(12) ? "blue" : "gray",
+                            backgroundColor: selectedGenres.includes(genre.id) ? "blue" : "gray",
                             padding: "0.5rem",
                             borderRadius: "1rem",
                           }}
-                          onClick={() => handleChangeGenresSearch(12)}>
+                          onClick={() => handleChangeGenresSearch(genre.id)}>
                           {genre.name}
                         </Typography>
                       );
@@ -506,6 +541,7 @@ const Explore = () => {
                     })}
               </Box>
               {/* Run time */}
+              <h4>Run time</h4>
               <Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <h5>From {runTime[0]} min</h5>
@@ -513,9 +549,11 @@ const Explore = () => {
                 </Box>
                 <Slider
                   value={runTime}
+                  onChangeCommitted={handleChangeCommitted}
                   onChange={handleChangeRunTimeSearch}
                   valueLabelDisplay="off"
                   aria-labelledby="range-slider"
+                  disableSwap
                   marks={[]}
                   step={10}
                   min={0}
@@ -530,18 +568,54 @@ const Explore = () => {
                     "& .MuiSlider-thumb": {
                       backgroundColor: "blue", // Color for the thumb
                     },
+                    maxWidth: "96%",
+                    margin: "0 0.5rem",
+                    padding: "0.5rem 0",
                   }}
                 />
               </Box>
               {/* Realease date */}
-              <Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <h5>From </h5>
-                  <input type="date" />
+              <h4>Realease date</h4>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>From </div>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      value={selectedFromDate}
+                      onChange={handleFromDateChange}
+                      slotProps={{
+                        textField: {
+                          sx: {
+                            backgroundColor: "gray",
+                            borderRadius: "0.5rem",
+                            "& .MuiInputBase-input": {
+                              color: "white",
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </LocalizationProvider>
                 </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <h5>To </h5>
-                  <input type="date" />
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>To </div>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      value={selectedToDate}
+                      onChange={handleToDateChange}
+                      slotProps={{
+                        textField: {
+                          sx: {
+                            backgroundColor: "gray",
+                            borderRadius: "0.5rem",
+                            "& .MuiInputBase-input": {
+                              color: "white",
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </LocalizationProvider>
                 </Box>
               </Box>
             </Collapse>
