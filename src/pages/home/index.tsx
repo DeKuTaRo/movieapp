@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Tabs, Tab, Typography } from "@mui/material";
+import { Box, Tabs, Tab, Typography, Skeleton } from "@mui/material";
 import axios from "axios";
 
 // Import Swiper styles
@@ -28,7 +28,7 @@ function CustomTabPanel(props: TabPanelProps) {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
       {...other}>
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 3, mb: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -179,7 +179,14 @@ const Home = () => {
         </Box>
         <CustomTabPanel value={typeFilms} index={0}>
           {isLoading ? (
-            <h1>Loading movies</h1>
+            <>
+              <Skeleton
+                sx={{ bgcolor: "gray", width: `152px`, height: `71px`, marginBottom: "42px", marginTop: "21px" }}
+              />
+              <Box sx={{ height: "508px" }}>
+                <Skeleton sx={{ bgcolor: "gray", height: "847px", marginTop: "-211px" }} />
+              </Box>
+            </>
           ) : (
             <>
               <ListMovies title={"Top Rated"} listMovies={movieTopRated} type="poster" genresMovie={genresMovie} />
@@ -191,7 +198,14 @@ const Home = () => {
         </CustomTabPanel>
         <CustomTabPanel value={typeFilms} index={1}>
           {isLoading ? (
-            <h1>Loading TV Series</h1>
+            <>
+              <Skeleton
+                sx={{ bgcolor: "gray", width: `152px`, height: `71px`, marginBottom: "42px", marginTop: "21px" }}
+              />
+              <Box sx={{ height: "508px" }}>
+                <Skeleton sx={{ bgcolor: "gray", height: "847px", marginTop: "-211px" }} />
+              </Box>
+            </>
           ) : (
             <>
               <ListTVSeries title={"Top Rated"} listMovies={tvTopRated} type="poster" genresTV={genresTV} />

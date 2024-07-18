@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, Paper, Typography, Card, CardContent } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
@@ -36,10 +37,10 @@ const ListMovies = ({
             return (
               <SwiperSlide key={index}>
                 <Paper elevation={0} sx={{ backgroundColor: "transparent" }}>
-                  <Card variant="outlined" sx={{ bgcolor: "transparent", color: "#E0E0E0", my: 3, border: "none" }}>
+                  <Card variant="outlined" sx={{ bgcolor: "transparent", color: "#E0E0E0", border: "none" }}>
                     <CardContent
                       sx={{
-                        padding: 0,
+                        padding: "0px !important",
                         position: "relative",
                         display: "inline-block",
                       }}>
@@ -52,11 +53,13 @@ const ListMovies = ({
                           width: "100%",
                           height: "100%",
                           backgroundImage: "linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7))",
-                        }}></Box>
+                          borderRadius: "0.5rem",
+                        }}
+                      />
                       <img
                         src={`https://image.tmdb.org/t/p/original/${movie.backdrop_path}`}
                         alt={movie.title}
-                        style={{ borderRadius: "8px", width: "100%", display: "block" }}
+                        style={{ borderRadius: "0.5rem", width: "100%", display: "block" }}
                       />
                       <Box
                         sx={{
@@ -137,14 +140,18 @@ const ListMovies = ({
             return (
               <SwiperSlide key={index}>
                 <Paper elevation={0} sx={{ backgroundColor: "transparent" }}>
-                  <Card variant="outlined" sx={{ bgcolor: "transparent", color: "#E0E0E0", my: 3, border: "none" }}>
-                    <CardContent sx={{ p: 0, position: "relative" }}>
+                  <Card variant="outlined" sx={{ bgcolor: "transparent", color: "#E0E0E0", border: "none" }}>
+                    <CardContent
+                      sx={{
+                        padding: "0px !important",
+                        position: "relative",
+                      }}>
                       <img
                         src={
                           movie.backdrop_path ? `https://image.tmdb.org/t/p/w200/${movie.backdrop_path}` : EmptyBackdrop
                         }
                         alt={movie.title}
-                        style={{ width: "100%", height: "100%", borderRadius: "8px" }}
+                        style={{ width: "100%", height: "100%", borderRadius: "0.5rem" }}
                       />
                       <Typography aria-label="movie rating" padding={0} textAlign={"center"}>
                         {movie.title}

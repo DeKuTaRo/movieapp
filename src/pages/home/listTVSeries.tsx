@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, Paper, Typography, Card, CardContent } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
@@ -41,7 +42,7 @@ const ListTVSeries = ({
                   <Card variant="outlined" sx={{ bgcolor: "transparent", color: "#E0E0E0", my: 3, border: "none" }}>
                     <CardContent
                       sx={{
-                        padding: 0,
+                        padding: "0px !important",
                         position: "relative",
                         display: "inline-block",
                       }}>
@@ -57,10 +58,12 @@ const ListTVSeries = ({
                         }}></Box>
                       <img
                         src={
-                          movie.backdrop_path ? `https://image.tmdb.org/t/p/original/${movie.backdrop_path}` : EmptyBackdrop
+                          movie.backdrop_path
+                            ? `https://image.tmdb.org/t/p/original/${movie.backdrop_path}`
+                            : EmptyBackdrop
                         }
                         alt={movie.original_name}
-                        style={{ borderRadius: "8px", width: "100%", display: "block" }}
+                        style={{ borderRadius: "0.5rem", width: "100%", display: "block" }}
                       />
                       <Box
                         sx={{
@@ -142,11 +145,11 @@ const ListTVSeries = ({
               <SwiperSlide key={index}>
                 <Paper elevation={0} sx={{ backgroundColor: "transparent" }}>
                   <Card variant="outlined" sx={{ bgcolor: "transparent", color: "#E0E0E0", my: 3, border: "none" }}>
-                    <CardContent sx={{ p: 0, position: "relative" }}>
+                    <CardContent sx={{ padding: "0px !important", position: "relative" }}>
                       <img
                         src={`https://image.tmdb.org/t/p/w200/${movie.backdrop_path}`}
                         alt=""
-                        style={{ width: "100%", height: "100%", borderRadius: "8px" }}
+                        style={{ width: "100%", height: "100%", borderRadius: "0.5rem" }}
                       />
                       <Typography aria-label="movie rating" padding={0} textAlign={"center"}>
                         {movie.original_name}
