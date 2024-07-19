@@ -26,16 +26,10 @@ import EmptyBackDrop from "../../assets/images/emptyBackdrop.jpg";
 import { homeIcon, movieIcon, tvSeriesIcon, bookmarkIcon } from "../../assets";
 
 import axios from "axios";
-import {
-  GenresData,
-  DetailsMovie,
-  DetailCastMovie,
-  DetailReviewMovie,
-  DetailMediaMovie,
-  DetailSimilarMovie,
-} from "../../assets/data";
+import { GenresData, MovieDataType, DetailCastMovie, DetailReviewMovie, DetailMediaMovie } from "../../assets/data";
 
 import { Star, StarBorder, StarHalf } from "@mui/icons-material";
+import { themeDarkMode } from "../../themes/ThemeProvider";
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -211,20 +205,18 @@ const MovieDetails = () => {
   const params = useParams();
   const location = useLocation();
   const [value, setValue] = React.useState(0);
-  const [isMovie, setIsMovie] = useState<boolean>(false);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
-  const [detailsMovie, setDetailsMovie] = React.useState<DetailsMovie | null>(null);
-  const [detailCastsMovie, setDetailCastsMovie] = React.useState<DetailCastMovie[] | null>(null);
+  const [detailsMovie, setDetailsMovie] = React.useState<MovieDataType | null>(null);
+  const [detailCastsMovie, setDetailCastsMovie] = React.useState<DetailCastMovie[]>([]);
   const [detailReviewsMovie, setDetailReviewsMovie] = React.useState<DetailReviewMovie | null>(null);
   const [detailMediasMovie, setDetailMediasMovie] = React.useState<DetailMediaMovie | null>(null);
-  const [detailSimilarMovie, setDetailSimilarMovie] = React.useState<DetailSimilarMovie[] | null>(null);
+  const [detailSimilarMovie, setDetailSimilarMovie] = React.useState<MovieDataType[]>([]);
+  const path = location.pathname;
+  const isMoviePath = path.startsWith("/movie/");
   useEffect(() => {
-    const path = location.pathname;
-    const isMoviePath = path.startsWith("/movie/");
-    setIsMovie(isMoviePath);
     const fetchDetails = async () => {
       try {
         const headers = {
@@ -232,20 +224,26 @@ const MovieDetails = () => {
           Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
         };
         const [response1, response2, response3, response4, response5] = await Promise.all([
-          axios.get(`https://api.themoviedb.org/3/${isMovie ? "movie" : "tv"}/${params.id}?language=en-US`, {
-            headers,
-          }),
-          axios.get(`https://api.themoviedb.org/3/${isMovie ? "movie" : "tv"}/${params.id}/credits?language=en-US`, {
-            headers,
-          }),
-          axios.get(`https://api.themoviedb.org/3/${isMovie ? "movie" : "tv"}/${params.id}/reviews?language=en-US`, {
-            headers,
-          }),
-          axios.get(`https://api.themoviedb.org/3/${isMovie ? "movie" : "tv"}/${params.id}/videos?language=en-US`, {
+          axios.get(`https://api.themoviedb.org/3/${isMoviePath ? "movie" : "tv"}/${params.id}?language=en-US`, {
             headers,
           }),
           axios.get(
-            `https://api.themoviedb.org/3/${isMovie ? "movie" : "tv"}/${params.id}/similar?language=en-US&page=1`,
+            `https://api.themoviedb.org/3/${isMoviePath ? "movie" : "tv"}/${params.id}/credits?language=en-US`,
+            {
+              headers,
+            }
+          ),
+          axios.get(
+            `https://api.themoviedb.org/3/${isMoviePath ? "movie" : "tv"}/${params.id}/reviews?language=en-US`,
+            {
+              headers,
+            }
+          ),
+          axios.get(`https://api.themoviedb.org/3/${isMoviePath ? "movie" : "tv"}/${params.id}/videos?language=en-US`, {
+            headers,
+          }),
+          axios.get(
+            `https://api.themoviedb.org/3/${isMoviePath ? "movie" : "tv"}/${params.id}/similar?language=en-US&page=1`,
             { headers }
           ),
         ]);
@@ -260,7 +258,7 @@ const MovieDetails = () => {
       }
     };
     fetchDetails();
-  }, [params.id, location.pathname, isMovie]);
+  }, [params.id, location.pathname, isMoviePath]);
 
   const { pathname } = useLocation();
   const genresMovieLocal: string | null = localStorage.getItem("genresMovieData");
@@ -278,7 +276,7 @@ const MovieDetails = () => {
     <>
       <Box
         sx={{
-          backgroundColor: "#10141F",
+          backgroundColor: themeDarkMode.backgroundColor,
           display: "flex",
           flexDirection: {
             xs: "column",
@@ -380,12 +378,12 @@ const MovieDetails = () => {
                   <img
                     src={`https://image.tmdb.org/t/p/w200/${detailsMovie.poster_path}`}
                     style={{ borderRadius: "8px", width: "100%", display: "block" }}
-                    alt=""
+                    alt={detailsMovie.title || detailsMovie.name}
                   />
                 </Item>
                 <Item sx={{ width: "500px" }}>
-                  <Typography variant="h3" style={{ marginTop: "2rem", marginBottom: "1rem" }}>
-                    {isMovie ? detailsMovie.title : detailsMovie.original_name}
+                  <Typography variant="h3" style={{ marginTop: "2rem", marginBottom: "1rem", fontWeight: "bold" }}>
+                    {detailsMovie.original_title || detailsMovie.original_name}
                   </Typography>
                   <Box
                     sx={{
@@ -394,7 +392,7 @@ const MovieDetails = () => {
                       gap: 2,
                     }}>
                     {detailsMovie.genres.map((genre, index) =>
-                      isMovie
+                      isMoviePath
                         ? genresMovieData.map(
                             (localGenre) =>
                               localGenre.id === genre.id && (
@@ -471,17 +469,49 @@ const MovieDetails = () => {
                       </Tabs>
                     </Box>
                     <CustomTabPanel value={value} index={0}>
-                      <h1>{detailsMovie.tagline}</h1>
-                      <h1>Story</h1>
-                      <Typography>{detailsMovie.overview}</Typography>
-                      <h1>Details</h1>
-                      <Typography>Status: {detailsMovie.status}</Typography>
-                      <Typography>
-                        Release date : {isMovie ? detailsMovie.release_date : detailsMovie.last_air_date}
+                      <Typography
+                        variant="h5"
+                        noWrap
+                        sx={{
+                          fontWeight: "bold",
+                          fontStyle: "italic",
+                        }}
+                        align="center">
+                        {detailsMovie.tagline}
                       </Typography>
-                      <Typography>{`Spoken language: ${detailsMovie.spoken_languages
-                        .map((lang) => lang.english_name)
-                        .join(", ")}`}</Typography>
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontWeight: "bold",
+                        }}>
+                        Story
+                      </Typography>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          color: "gray",
+                          marginLeft: "1.5rem",
+                        }}>
+                        {detailsMovie.overview}
+                      </Typography>
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontWeight: "bold",
+                        }}>
+                        Details
+                      </Typography>
+                      <Box sx={{ marginLeft: "1.5rem" }}>
+                        <Typography variant="subtitle1">Status: {detailsMovie.status}</Typography>
+                        <Typography variant="subtitle1">
+                          {`Release date : ${detailsMovie.release_date}` ||
+                            `Last air date: ${detailsMovie.last_air_date}`}
+                        </Typography>
+                        <Typography variant="subtitle1">{`Spoken language: ${
+                          detailsMovie.spoken_languages &&
+                          detailsMovie.spoken_languages.map((lang) => lang.english_name).join(", ")
+                        }`}</Typography>
+                      </Box>
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={1}>
                       <Grid container spacing={2} sx={{ height: "450px", overflowY: "scroll" }}>
@@ -659,7 +689,6 @@ const MovieDetails = () => {
           sx={{
             backgroundColor: "#161d2f",
             padding: 2,
-            borderRadius: 2,
             display: "flex",
             flexDirection: {
               xs: "row",
@@ -679,7 +708,7 @@ const MovieDetails = () => {
               alignItems: "center",
               borderRadius: "default",
               p: 1,
-              backgroundColor: "#10141f",
+              backgroundColor: themeDarkMode.backgroundColor,
               border: "none",
             }}>
             <InputBase
@@ -699,30 +728,30 @@ const MovieDetails = () => {
               }
             />
           </Paper>
-          <List sx={{ width: "100%", maxHeight: "90%", overflowY: "scroll" }}>
-            {detailSimilarMovie &&
-              detailSimilarMovie.map((movie) => (
-                <ListItem key={movie.id}>
-                  <Card sx={{ display: "flex", backgroundColor: "#161d2f", color: "white" }}>
-                    <CardMedia
-                      component="img"
-                      sx={{ width: "26%" }}
-                      image={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                      alt={movie.title}
-                    />
-                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                      <CardContent sx={{ flex: "1 0 auto" }}>
-                        <Typography component="div" variant="h6">
-                          {movie.title}
-                        </Typography>
-                        <Typography variant="subtitle1" component="div">
-                          {movie.release_date}
-                        </Typography>
-                      </CardContent>
-                    </Box>
-                  </Card>
-                </ListItem>
-              ))}
+          <List sx={{ maxHeight: "90%", overflowY: "scroll" }}>
+            {detailSimilarMovie.map(
+              (movie) =>
+                movie.backdrop_path !== null && (
+                  <ListItem key={movie.id} sx={{ px: 0 }}>
+                    <Card sx={{ display: "flex", backgroundColor: "#161d2f", color: "white", width: "100%" }}>
+                      <CardMedia
+                        component="img"
+                        sx={{ width: "26%" }}
+                        image={`https://image.tmdb.org/t/p/w342${movie.backdrop_path}`}
+                        alt={movie.title || movie.name}
+                      />
+                      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                        <CardContent sx={{ flex: "1 0 auto" }}>
+                          <Typography variant="subtitle1" noWrap>
+                            {movie.title || movie.name}
+                          </Typography>
+                          <Typography variant="subtitle2">{movie.release_date || movie.first_air_date}</Typography>
+                        </CardContent>
+                      </Box>
+                    </Card>
+                  </ListItem>
+                )
+            )}
           </List>
           <Button variant="outlined">See more</Button>
         </Box>

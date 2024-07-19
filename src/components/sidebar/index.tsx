@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Box, Hidden, Typography } from "@mui/material";
 import { homeIcon, movieIcon, tvSeriesIcon, bookmarkIcon, exploreIcon } from "../../assets";
+import { themeDarkMode } from "../../themes/ThemeProvider";
 
 const navLinks = [
   {
@@ -61,7 +62,7 @@ const Sidebar = () => {
   return (
     <Box
       sx={{
-        backgroundColor: "#161d2f",
+        backgroundColor: themeDarkMode.backgroundSidebar,
         padding: 2,
         width: {
           sm: "100%",
@@ -84,7 +85,7 @@ const Sidebar = () => {
         }}>
         <Hidden smDown>
           <Typography variant="h5" component="h1" mt={2} align="center" sx={{ width: "100%" }}>
-            PikaShowApp
+            Choubeobeos
           </Typography>
         </Hidden>
 
@@ -116,9 +117,7 @@ const Sidebar = () => {
                       display: "flex",
                       alignItems: "center",
                       gap: 4,
-                      color: "white",
                       paddingLeft: "1rem",
-                      // backgroundColor: `${pathname === linkSidebar.link ? "#8e71cd" : "#ccc"}`,
                     }}>
                     <img
                       src={linkSidebar.icon}
@@ -133,7 +132,14 @@ const Sidebar = () => {
                       }}
                     />
                     <Hidden mdDown>
-                      <Typography sx={{ color: `${pathname === linkSidebar.link ? "#8e71cd" : "#ccc"}` }}>
+                      <Typography
+                        sx={{
+                          color: `${
+                            pathname === linkSidebar.link
+                              ? themeDarkMode.textColorItemActiveSidebar
+                              : themeDarkMode.textColorItemSidebar
+                          }`,
+                        }}>
                         {linkSidebar.name}
                       </Typography>
                     </Hidden>

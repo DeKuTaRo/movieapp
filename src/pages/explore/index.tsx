@@ -24,13 +24,14 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { homeIcon, movieIcon, tvSeriesIcon, bookmarkIcon, exploreIcon } from "../../assets";
 
 import axios from "axios";
-import { GenresData, MovieDataType, TVDataType } from "../../assets/data";
+import { GenresData, MovieDataType } from "../../assets/data";
 
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { themeDarkMode } from "../../themes/ThemeProvider";
 
 const MovieItem: React.FC<{ movie: any }> = ({ movie }) => (
   <Item>
@@ -155,7 +156,7 @@ const Explore = () => {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const [listsMovieSearch, setListsMovieSearch] = React.useState<MovieDataType[]>([]);
-  const [listsTVShowSearch, setListsTVShowSearch] = React.useState<TVDataType[]>([]);
+  const [listsTVShowSearch, setListsTVShowSearch] = React.useState<MovieDataType[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -320,7 +321,7 @@ const Explore = () => {
     <>
       <Box
         sx={{
-          backgroundColor: "#10141F",
+          backgroundColor: themeDarkMode.backgroundColor,
           display: "flex",
           flexDirection: {
             xs: "column",

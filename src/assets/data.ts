@@ -1,23 +1,22 @@
 export interface MovieDataType {
   id: string;
-  title: string;
+  title?: string;
+  name?: string;
+  original_title?: string;
+  original_name?: string;
   backdrop_path: string;
   poster_path: string;
   overview: string;
-  release_date: string;
+  release_date?: string;
+  first_air_date?: string;
   vote_average: string;
   genre_ids: number[];
-}
-
-export interface TVDataType {
-  id: string;
-  original_name: string;
-  backdrop_path: string;
-  poster_path: string;
-  overview: string;
-  first_air_date: string;
-  vote_average: string;
-  genre_ids: number[];
+  runtime?: string;
+  status?: string;
+  spoken_languages?: Language[];
+  last_air_date?: string;
+  tagline: string;
+  genres: GenresData[];
 }
 
 export interface GenresData {
@@ -29,23 +28,6 @@ interface Language {
   english_name: string;
   iso_639_1: string;
   name: string;
-}
-
-export interface DetailsMovie {
-  id: string;
-  title?: string;
-  original_name?: string;
-  backdrop_path: string;
-  runtime: string;
-  status: string;
-  spoken_languages: Language[];
-  poster_path: string;
-  overview: string;
-  release_date?: string;
-  last_air_date?: string;
-  vote_average: string;
-  genres: GenresData[];
-  tagline: string;
 }
 
 export interface DetailCastMovie {
@@ -86,18 +68,4 @@ export interface DetailMediaMovie {
     key: string;
     type: string;
   }[];
-}
-
-export interface DetailSimilarMovie {
-  id: string;
-  poster_path: string;
-  title: string;
-  release_date: string;
-}
-
-export interface ListMoviesSearch {
-  id: string;
-  title: string;
-  vote_average: number;
-  poster_path: string;
 }
