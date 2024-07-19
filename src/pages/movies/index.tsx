@@ -209,9 +209,9 @@ const navLinks = [
 
 const MovieDetails = () => {
   const params = useParams();
-
+  const location = useLocation();
   const [value, setValue] = React.useState(0);
-
+  const [isMovie, setIsMovie] = useState<boolean>(false);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -222,6 +222,9 @@ const MovieDetails = () => {
   const [detailMediasMovie, setDetailMediasMovie] = React.useState<DetailMediaMovie | null>(null);
   const [detailSimilarMovie, setDetailSimilarMovie] = React.useState<DetailSimilarMovie[] | null>(null);
   useEffect(() => {
+    const path = location.pathname;
+    const isMoviePath = path.startsWith("/movie/");
+    setIsMovie(isMoviePath);
     const fetchDetails = async () => {
       try {
         const headers = {
@@ -229,11 +232,22 @@ const MovieDetails = () => {
           Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
         };
         const [response1, response2, response3, response4, response5] = await Promise.all([
-          axios.get(`https://api.themoviedb.org/3/movie/${params.id}?language=en-US`, { headers }),
-          axios.get(`https://api.themoviedb.org/3/movie/${params.id}/credits?language=en-US`, { headers }),
-          axios.get(`https://api.themoviedb.org/3/movie/${params.id}/reviews?language=en-US`, { headers }),
-          axios.get(`https://api.themoviedb.org/3/movie/${params.id}/videos?language=en-US`, { headers }),
-          axios.get(`https://api.themoviedb.org/3/movie/${params.id}/similar?language=en-US&page=1`, { headers }),
+          axios.get(`https://api.themoviedb.org/3/${isMovie ? "movie" : "tv"}/${params.id}?language=en-US`, {
+            headers,
+          }),
+          axios.get(`https://api.themoviedb.org/3/${isMovie ? "movie" : "tv"}/${params.id}/credits?language=en-US`, {
+            headers,
+          }),
+          axios.get(`https://api.themoviedb.org/3/${isMovie ? "movie" : "tv"}/${params.id}/reviews?language=en-US`, {
+            headers,
+          }),
+          axios.get(`https://api.themoviedb.org/3/${isMovie ? "movie" : "tv"}/${params.id}/videos?language=en-US`, {
+            headers,
+          }),
+          axios.get(
+            `https://api.themoviedb.org/3/${isMovie ? "movie" : "tv"}/${params.id}/similar?language=en-US&page=1`,
+            { headers }
+          ),
         ]);
 
         setDetailsMovie(response1.data);
@@ -246,16 +260,20 @@ const MovieDetails = () => {
       }
     };
     fetchDetails();
-  }, [params.id]);
+  }, [params.id, location.pathname, isMovie]);
 
   const { pathname } = useLocation();
   const genresMovieLocal: string | null = localStorage.getItem("genresMovieData");
   const genresMovieData: GenresData[] = genresMovieLocal !== null && JSON.parse(genresMovieLocal);
 
+  const genresTVLocal: string | null = localStorage.getItem("genresTVData");
+  const genresTVData: GenresData[] = genresTVLocal !== null && JSON.parse(genresTVLocal);
+
   const [expandedIndex, setExpandedIndex] = useState<string | null>(null);
   const handleShowFullReview = (id: string) => {
     setExpandedIndex(expandedIndex === id ? null : id);
   };
+
   return (
     <>
       <Box
@@ -367,7 +385,7 @@ const MovieDetails = () => {
                 </Item>
                 <Item sx={{ width: "500px" }}>
                   <Typography variant="h3" style={{ marginTop: "2rem", marginBottom: "1rem" }}>
-                    {detailsMovie.title}
+                    {isMovie ? detailsMovie.title : detailsMovie.original_name}
                   </Typography>
                   <Box
                     sx={{
@@ -376,22 +394,39 @@ const MovieDetails = () => {
                       gap: 2,
                     }}>
                     {detailsMovie.genres.map((genre, index) =>
-                      genresMovieData.map(
-                        (localGenre) =>
-                          localGenre.id === genre.id && (
-                            <Typography
-                              key={index}
-                              sx={{
-                                backgroundColor: "transparent",
-                                padding: "0.75rem",
-                                borderRadius: "1rem",
-                                color: "white",
-                                border: "1px solid white",
-                              }}>
-                              {localGenre.name}
-                            </Typography>
+                      isMovie
+                        ? genresMovieData.map(
+                            (localGenre) =>
+                              localGenre.id === genre.id && (
+                                <Typography
+                                  key={index}
+                                  sx={{
+                                    backgroundColor: "transparent",
+                                    padding: "0.75rem",
+                                    borderRadius: "1rem",
+                                    color: "white",
+                                    border: "1px solid white",
+                                  }}>
+                                  {localGenre.name}
+                                </Typography>
+                              )
                           )
-                      )
+                        : genresTVData.map(
+                            (localGenre) =>
+                              localGenre.id === genre.id && (
+                                <Typography
+                                  key={index}
+                                  sx={{
+                                    backgroundColor: "transparent",
+                                    padding: "0.75rem",
+                                    borderRadius: "1rem",
+                                    color: "white",
+                                    border: "1px solid white",
+                                  }}>
+                                  {localGenre.name}
+                                </Typography>
+                              )
+                          )
                     )}
                   </Box>
                 </Item>
@@ -436,11 +471,14 @@ const MovieDetails = () => {
                       </Tabs>
                     </Box>
                     <CustomTabPanel value={value} index={0}>
+                      <h1>{detailsMovie.tagline}</h1>
                       <h1>Story</h1>
                       <Typography>{detailsMovie.overview}</Typography>
                       <h1>Details</h1>
                       <Typography>Status: {detailsMovie.status}</Typography>
-                      <Typography>Release date : {detailsMovie.release_date}</Typography>
+                      <Typography>
+                        Release date : {isMovie ? detailsMovie.release_date : detailsMovie.last_air_date}
+                      </Typography>
                       <Typography>{`Spoken language: ${detailsMovie.spoken_languages
                         .map((lang) => lang.english_name)
                         .join(", ")}`}</Typography>
@@ -589,7 +627,7 @@ const MovieDetails = () => {
                 </Grid>
                 <Grid item xs={3}>
                   <h1>Media</h1>
-                  <Box sx={{ paddingRight: "0.75rem", height: "400px", overflowY: "scroll" }}>
+                  {/* <Box sx={{ paddingRight: "0.75rem", height: "400px", overflowY: "scroll" }}>
                     {detailMediasMovie ? (
                       detailMediasMovie.results.map((media) => (
                         <Box key={media.id}>
@@ -611,7 +649,7 @@ const MovieDetails = () => {
                     ) : (
                       <Typography>There is no media available.</Typography>
                     )}
-                  </Box>
+                  </Box> */}
                 </Grid>
               </Grid>
             </Box>

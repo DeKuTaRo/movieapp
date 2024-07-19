@@ -164,13 +164,11 @@ const Home = () => {
           lg: "row",
         },
         color: "white",
-        padding: 3,
-        gap: 3,
         overflowY: "hidden",
         height: "100vh",
       }}>
       <Sidebar />
-      <Box sx={{ width: "100%", overflowY: "scroll" }}>
+      <Box sx={{ width: "100%", overflowY: "scroll", padding: 2, marginTop: 1 }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={typeFilms} onChange={handleChange} aria-label="basic tabs example">
             <Tab sx={{ color: "white" }} label="Movie" {...a11yProps(0)} />
@@ -216,13 +214,30 @@ const Home = () => {
           )}
         </CustomTabPanel>
       </Box>
-      {isLoading ? (
-        <Typography>Loading genres ...</Typography>
-      ) : typeFilms === 0 ? (
-        <SidebarRight genres={genresMovie} />
-      ) : (
-        <SidebarRight genres={genresTV} />
-      )}
+      <Box
+        sx={{
+          backgroundColor: "#161d2f",
+          padding: 2,
+          display: "flex",
+          flexDirection: {
+            xs: "row",
+            lg: "column",
+          },
+          gap: 3,
+          alignItems: "center",
+          width: {
+            sm: "100%",
+            lg: 450,
+          },
+        }}>
+        {isLoading ? (
+          <Typography>Loading genres ...</Typography>
+        ) : typeFilms === 0 ? (
+          <SidebarRight genres={genresMovie} />
+        ) : (
+          <SidebarRight genres={genresTV} />
+        )}
+      </Box>
     </Box>
   );
 };

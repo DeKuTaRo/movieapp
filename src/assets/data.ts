@@ -33,16 +33,19 @@ interface Language {
 
 export interface DetailsMovie {
   id: string;
-  title: string;
+  title?: string;
+  original_name?: string;
   backdrop_path: string;
   runtime: string;
   status: string;
   spoken_languages: Language[];
   poster_path: string;
   overview: string;
-  release_date: string;
+  release_date?: string;
+  last_air_date?: string;
   vote_average: string;
   genres: GenresData[];
+  tagline: string;
 }
 
 export interface DetailCastMovie {
