@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Paper,
   InputBase,
@@ -45,6 +45,7 @@ function CustomTabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
+      style={{ marginTop: "1rem" }}
       {...other}>
       {value === index && <Box sx={{ p: 1 }}>{children}</Box>}
     </div>
@@ -65,7 +66,7 @@ function Item(props: BoxProps) {
       sx={{
         p: 1,
         m: 1,
-        color: (theme) => (theme.palette.mode === "dark" ? "#101010" : "grey.100"),
+        color: themeDarkMode.title,
         borderRadius: 2,
         fontSize: "0.875rem",
         fontWeight: "700",
@@ -83,7 +84,6 @@ interface RatingProps {
 }
 
 const Rating: React.FC<RatingProps> = ({ value, maxValue = 10, totalStars = 5 }) => {
-  // Convert the value to a 0-5 scale
   const normalizedValue = (value / maxValue) * totalStars;
   const filledStars = Math.floor(normalizedValue);
   const hasHalfStar = normalizedValue % 1 >= 0.5;
@@ -145,14 +145,14 @@ const NumberCircle: React.FC<NumberCircleProps> = ({ number }) => {
           top: 0,
           left: 0,
         }}>
-        <circle cx="36" cy="36" r={radius} fill="none" stroke="#161d2f" strokeWidth="4" />
+        <circle cx="36" cy="36" r={radius} fill="none" stroke={themeDarkMode.backgroundSidebar} strokeWidth="8" />
         <circle
           cx="36"
           cy="36"
           r={radius}
           fill="none"
-          stroke="#1976d2"
-          strokeWidth="4"
+          stroke={themeDarkMode.textPrimary}
+          strokeWidth="8"
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           transform="rotate(-90 36 36)"
@@ -166,7 +166,7 @@ const NumberCircle: React.FC<NumberCircleProps> = ({ number }) => {
           borderRadius: "50%",
           width: 36,
           height: 36,
-          backgroundColor: "#161d2f",
+          backgroundColor: themeDarkMode.backgroundSidebar,
           color: "white",
           fontSize: 16,
           fontFamily: "Arial, sans-serif",
@@ -201,12 +201,76 @@ const navLinks = [
   },
 ];
 
+interface MediaProps {
+  id: string;
+  keyVideo: string;
+  type: string;
+  name: string;
+}
+
+const MediaEmbed: React.FC<MediaProps> = ({ id, keyVideo, type, name }) => {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!hasLoaded && iframeRef.current) {
+      const iframe = iframeRef.current;
+      iframe.src = `https://www.youtube.com/embed/${keyVideo}?enablejsapi=1&origin=${encodeURIComponent(
+        window.location.origin
+      )}`;
+      setHasLoaded(true);
+
+      // Function to handle messages from the iframe
+      const handleMessage = (event: MessageEvent) => {
+        if (event.source === iframe.contentWindow) {
+          // Check if the video has started playing
+          if (event.data && typeof event.data === "string") {
+            const data = JSON.parse(event.data);
+            if (data.event === "onStateChange" && data.info === 1) {
+              // Video started playing, remove the event listener
+              window.removeEventListener("message", handleMessage);
+            }
+          }
+        }
+      };
+
+      // Add event listener for messages from the iframe
+      window.addEventListener("message", handleMessage);
+
+      // Cleanup function
+      return () => {
+        window.removeEventListener("message", handleMessage);
+      };
+    }
+  }, [keyVideo, hasLoaded]);
+
+  return (
+    <>
+      <iframe
+        ref={iframeRef}
+        allowFullScreen={true}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        title={type}
+        width="100%"
+        height="100%"
+        id={`widget-${id}`}
+      />
+      <Typography variant="h6" noWrap>
+        {name}
+      </Typography>
+    </>
+  );
+};
+
 const MovieDetails = () => {
   const params = useParams();
   const location = useLocation();
-  const [value, setValue] = React.useState(0);
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+  const [movieTab, setMovieTab] = React.useState(0);
+
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const handleChangeTabMovie = (event: React.SyntheticEvent, newValue: number) => {
+    setMovieTab(newValue);
   };
 
   const [detailsMovie, setDetailsMovie] = React.useState<MovieDataType | null>(null);
@@ -214,11 +278,11 @@ const MovieDetails = () => {
   const [detailReviewsMovie, setDetailReviewsMovie] = React.useState<DetailReviewMovie | null>(null);
   const [detailMediasMovie, setDetailMediasMovie] = React.useState<DetailMediaMovie | null>(null);
   const [detailSimilarMovie, setDetailSimilarMovie] = React.useState<MovieDataType[]>([]);
-  const path = location.pathname;
-  const isMoviePath = path.startsWith("/movie/");
+  const isMoviePath = location.pathname.startsWith("/movie/");
   useEffect(() => {
     const fetchDetails = async () => {
       try {
+        setIsLoading(true);
         const headers = {
           accept: "application/json",
           Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
@@ -255,21 +319,22 @@ const MovieDetails = () => {
         setDetailSimilarMovie(response5.data.results);
       } catch (err) {
         console.log("error: ", err);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchDetails();
   }, [params.id, location.pathname, isMoviePath]);
 
-  const { pathname } = useLocation();
   const genresMovieLocal: string | null = localStorage.getItem("genresMovieData");
   const genresMovieData: GenresData[] = genresMovieLocal !== null && JSON.parse(genresMovieLocal);
 
   const genresTVLocal: string | null = localStorage.getItem("genresTVData");
   const genresTVData: GenresData[] = genresTVLocal !== null && JSON.parse(genresTVLocal);
 
-  const [expandedIndex, setExpandedIndex] = useState<string | null>(null);
+  const [toggleReview, setToggleReview] = useState<string | null>(null);
   const handleShowFullReview = (id: string) => {
-    setExpandedIndex(expandedIndex === id ? null : id);
+    setToggleReview(toggleReview === id ? null : id);
   };
 
   return (
@@ -289,7 +354,7 @@ const MovieDetails = () => {
         }}>
         <Box
           sx={{
-            backgroundColor: "#161d2f",
+            backgroundColor: themeDarkMode.backgroundSidebar,
             padding: 2,
             borderRadius: 2,
             display: "flex",
@@ -330,7 +395,7 @@ const MovieDetails = () => {
                     style={{
                       width: "18px",
                       filter: `${
-                        pathname === item.link
+                        location.pathname === item.link
                           ? "invert(58%) sepia(14%) saturate(3166%) hue-rotate(215deg) brightness(91%) contrast(87%)"
                           : "invert(84%)"
                       }`,
@@ -362,19 +427,20 @@ const MovieDetails = () => {
                   width: "100%",
                   borderBottomLeftRadius: "2rem",
                   borderTopLeftRadius: "2rem",
-                  backgroundImage: "linear-gradient(to bottom right , transparent, rgba(0,0,0,0.7))",
+                  backgroundImage: "linear-gradient(to bottom left , rgba(0,0,0,0.2) , rgba(0,0,0,0.7))",
                 }}
               />
               <Box
                 sx={{
                   position: "absolute",
-                  top: "40%",
+                  top: "45%",
                   width: "100%",
                   display: "flex",
-                  justifyContent: "space-evenly",
+                  gap: 3,
+                  justifyContent: "center",
                   borderRadius: 1,
                 }}>
-                <Item sx={{ width: "150px" }}>
+                <Item sx={{ width: "180px" }}>
                   <img
                     src={`https://image.tmdb.org/t/p/w200/${detailsMovie.poster_path}`}
                     style={{ borderRadius: "8px", width: "100%", display: "block" }}
@@ -382,7 +448,7 @@ const MovieDetails = () => {
                   />
                 </Item>
                 <Item sx={{ width: "500px" }}>
-                  <Typography variant="h3" style={{ marginTop: "2rem", marginBottom: "1rem", fontWeight: "bold" }}>
+                  <Typography variant="h4" style={{ marginTop: "3rem", marginBottom: "0.5rem", fontWeight: "bold" }}>
                     {detailsMovie.original_title || detailsMovie.original_name}
                   </Typography>
                   <Box
@@ -402,8 +468,7 @@ const MovieDetails = () => {
                                     backgroundColor: "transparent",
                                     padding: "0.75rem",
                                     borderRadius: "1rem",
-                                    color: "white",
-                                    border: "1px solid white",
+                                    border: "1px solid",
                                   }}>
                                   {localGenre.name}
                                 </Typography>
@@ -429,7 +494,11 @@ const MovieDetails = () => {
                   </Box>
                 </Item>
                 <Item sx={{ marginTop: "8rem" }}>
-                  <Button size="large" startIcon={<PlayArrowIcon />} variant="contained">
+                  <Button
+                    size="large"
+                    sx={{ backgroundColor: themeDarkMode.textPrimary }}
+                    startIcon={<PlayArrowIcon />}
+                    variant="contained">
                     Watch
                   </Button>
                 </Item>
@@ -455,23 +524,22 @@ const MovieDetails = () => {
                   </Box>
                   <Box>
                     <Typography>EP Length</Typography>
-                    <Typography>{detailsMovie.runtime} mins</Typography>
+                    <Typography sx={{ color: themeDarkMode.textColor }}>{detailsMovie.runtime} mins</Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={7}>
                   <Box>
                     <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                      <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" centered>
+                      <Tabs value={movieTab} onChange={handleChangeTabMovie} aria-label="movie detail tab" centered>
                         <Tab sx={{ color: "white" }} label="Overall" {...a11yProps(0)} />
                         <Tab sx={{ color: "white" }} label="Cast" {...a11yProps(1)} />
                         <Tab sx={{ color: "white" }} label="Reviews" {...a11yProps(2)} />
                         {/* <Tab sx={{ color: "white" }} label="Seasons" {...a11yProps(2)} /> */}
                       </Tabs>
                     </Box>
-                    <CustomTabPanel value={value} index={0}>
+                    <CustomTabPanel value={movieTab} index={0}>
                       <Typography
                         variant="h5"
-                        noWrap
                         sx={{
                           fontWeight: "bold",
                           fontStyle: "italic",
@@ -489,7 +557,7 @@ const MovieDetails = () => {
                       <Typography
                         variant="subtitle1"
                         sx={{
-                          color: "gray",
+                          color: themeDarkMode.textColor,
                           marginLeft: "1.5rem",
                         }}>
                         {detailsMovie.overview}
@@ -501,7 +569,7 @@ const MovieDetails = () => {
                         }}>
                         Details
                       </Typography>
-                      <Box sx={{ marginLeft: "1.5rem" }}>
+                      <Box sx={{ marginLeft: "1.5rem", color: themeDarkMode.textColor }}>
                         <Typography variant="subtitle1">Status: {detailsMovie.status}</Typography>
                         <Typography variant="subtitle1">
                           {`Release date : ${detailsMovie.release_date}` ||
@@ -513,7 +581,7 @@ const MovieDetails = () => {
                         }`}</Typography>
                       </Box>
                     </CustomTabPanel>
-                    <CustomTabPanel value={value} index={1}>
+                    <CustomTabPanel value={movieTab} index={1}>
                       <Grid container spacing={2} sx={{ height: "450px", overflowY: "scroll" }}>
                         {detailCastsMovie &&
                           detailCastsMovie.map((cast) => (
@@ -529,15 +597,15 @@ const MovieDetails = () => {
                           ))}
                       </Grid>
                     </CustomTabPanel>
-                    <CustomTabPanel value={value} index={2}>
+                    <CustomTabPanel value={movieTab} index={2}>
                       <Grid container spacing={1} sx={{ height: "400px", overflowY: "scroll", marginTop: "1rem" }}>
-                        {detailReviewsMovie ? (
+                        {detailReviewsMovie && detailReviewsMovie.results.length > 0 ? (
                           detailReviewsMovie.results.map((review) => (
                             <React.Fragment key={review.id}>
                               <Grid item xs={2}>
                                 <Item>
                                   <Avatar
-                                    alt="Remy Sharp"
+                                    alt={review.author}
                                     src={
                                       review.author_details.avatar_path
                                         ? `https://image.tmdb.org/t/p/original/${review.author_details.avatar_path}`
@@ -555,24 +623,25 @@ const MovieDetails = () => {
                                     </Typography>
                                     <Rating value={review.author_details.rating} />
                                   </Box>
-                                  {expandedIndex === review.id ? (
-                                    <Typography>{review.content}</Typography>
-                                  ) : (
-                                    <Typography
-                                      sx={{
-                                        overflow: "hidden",
-                                        display: "-webkit-box",
-                                        WebkitLineClamp: 3,
-                                        WebkitBoxOrient: "vertical",
-                                      }}>
-                                      {review.content}
-                                    </Typography>
-                                  )}
-                                  <Button
-                                    variant="outlined"
-                                    sx={{ color: "white" }}
-                                    onClick={() => handleShowFullReview(review.id)}>
-                                    {expandedIndex === review.id ? "Show less" : "Show more"}
+
+                                  <Typography
+                                    variant="body2"
+                                    gutterBottom
+                                    sx={
+                                      toggleReview === review.id
+                                        ? undefined
+                                        : {
+                                            overflow: "hidden",
+                                            display: "-webkit-box",
+                                            WebkitLineClamp: 3,
+                                            WebkitBoxOrient: "vertical",
+                                          }
+                                    }>
+                                    {review.content}
+                                  </Typography>
+
+                                  <Button variant="outlined" onClick={() => handleShowFullReview(review.id)}>
+                                    {toggleReview === review.id ? "Show less" : "Show more"}
                                   </Button>
                                   <Typography align="right">{formatDateString(review.created_at)}</Typography>
                                 </Item>
@@ -580,7 +649,9 @@ const MovieDetails = () => {
                             </React.Fragment>
                           ))
                         ) : (
-                          <Typography>There is no reviews yet</Typography>
+                          <Typography align="center" sx={{ width: "100%" }}>
+                            There is no reviews yet
+                          </Typography>
                         )}
                       </Grid>
                     </CustomTabPanel>
@@ -657,29 +728,19 @@ const MovieDetails = () => {
                 </Grid>
                 <Grid item xs={3}>
                   <h1>Media</h1>
-                  {/* <Box sx={{ paddingRight: "0.75rem", height: "400px", overflowY: "scroll" }}>
-                    {detailMediasMovie ? (
+                  <Box sx={{ paddingRight: "0.75rem", height: "400px", overflowY: "scroll" }}>
+                    {!isLoading && detailMediasMovie && detailMediasMovie.results.length > 0 ? (
                       detailMediasMovie.results.map((media) => (
                         <Box key={media.id}>
-                          <Typography>{media.type}</Typography>
-                          <iframe
-                            allowFullScreen={true}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            title="Video trailer"
-                            width="100%"
-                            height="100%"
-                            src={`https://www.youtube.com/embed/${media.key}?enablejsapi=1&amp;amp;origin=http%3A%2F%2Flocalhost%3A3000&amp;amp;widgetid=1`}
-                            id="widget2"
-                            className="absolute top-0 left-0 !w-full !h-full"></iframe>
-                          <Typography variant="h6" noWrap>
-                            {media.name}
-                          </Typography>
+                          <MediaEmbed id={media.id} keyVideo={media.key} type={media.type} name={media.name} />
                         </Box>
                       ))
                     ) : (
-                      <Typography>There is no media available.</Typography>
+                      <Typography align="center" sx={{ width: "100%" }}>
+                        There is no media available.
+                      </Typography>
                     )}
-                  </Box> */}
+                  </Box>
                 </Grid>
               </Grid>
             </Box>
@@ -687,7 +748,7 @@ const MovieDetails = () => {
         )}
         <Box
           sx={{
-            backgroundColor: "#161d2f",
+            backgroundColor: themeDarkMode.backgroundSidebar,
             padding: 2,
             display: "flex",
             flexDirection: {
@@ -698,7 +759,7 @@ const MovieDetails = () => {
             alignItems: "center",
             width: {
               sm: "100%",
-              lg: 350,
+              lg: 300,
             },
           }}>
           <Paper
@@ -706,18 +767,16 @@ const MovieDetails = () => {
             sx={{
               display: "flex",
               alignItems: "center",
-              borderRadius: "default",
+              borderRadius: "0.5rem",
               p: 1,
               backgroundColor: themeDarkMode.backgroundColor,
-              border: "none",
+              width: "80%",
             }}>
             <InputBase
               placeholder="Search here ..."
               sx={{
                 mx: 1,
-                flex: 1,
-                color: "white",
-                border: "none",
+                color: themeDarkMode.title,
               }}
               // value={search}
               // onChange={handleSearch}
@@ -728,32 +787,48 @@ const MovieDetails = () => {
               }
             />
           </Paper>
-          <List sx={{ maxHeight: "90%", overflowY: "scroll" }}>
+          <List sx={{ maxHeight: "90%", overflowY: "scroll", maxWidth: "100%" }}>
             {detailSimilarMovie.map(
               (movie) =>
                 movie.backdrop_path !== null && (
-                  <ListItem key={movie.id} sx={{ px: 0 }}>
-                    <Card sx={{ display: "flex", backgroundColor: "#161d2f", color: "white", width: "100%" }}>
+                  <ListItem key={movie.id}>
+                    <Card
+                      sx={{
+                        display: "flex",
+                        backgroundColor: themeDarkMode.backgroundSidebar,
+                        color: "white",
+                        width: "100%",
+                      }}>
                       <CardMedia
                         component="img"
                         sx={{ width: "26%" }}
                         image={`https://image.tmdb.org/t/p/w342${movie.backdrop_path}`}
                         alt={movie.title || movie.name}
                       />
-                      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                        <CardContent sx={{ flex: "1 0 auto" }}>
-                          <Typography variant="subtitle1" noWrap>
-                            {movie.title || movie.name}
-                          </Typography>
-                          <Typography variant="subtitle2">{movie.release_date || movie.first_air_date}</Typography>
-                        </CardContent>
-                      </Box>
+                      <CardContent sx={{ display: "flex", flexDirection: "column" }}>
+                        <Typography variant="subtitle1" noWrap>
+                          {movie.title || movie.name}
+                        </Typography>
+                        <Typography variant="subtitle2" sx={{ color: themeDarkMode.textColor }}>
+                          {movie.release_date || movie.first_air_date}
+                        </Typography>
+                      </CardContent>
                     </Card>
                   </ListItem>
                 )
             )}
           </List>
-          <Button variant="outlined">See more</Button>
+          <Button
+            sx={{
+              backgroundColor: themeDarkMode.backgroundColor,
+              color: themeDarkMode.title,
+              border: "none",
+              width: "80%",
+              borderRadius: "1rem",
+            }}
+            variant="outlined">
+            See more
+          </Button>
         </Box>
       </Box>
     </>

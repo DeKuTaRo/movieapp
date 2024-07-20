@@ -176,7 +176,7 @@ const Home = () => {
       <Sidebar />
       <Box sx={{ width: "100%", overflowX: "hidden", overflowY: "scroll", padding: 2, marginTop: 1 }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs value={typeFilms} onChange={handleChange} aria-label="basic tabs example">
+          <Tabs value={typeFilms} onChange={handleChange} aria-label="tab type movies">
             <Tab sx={{ color: themeDarkMode.title }} label="Movie" {...a11yProps(0)} />
             <Tab sx={{ color: themeDarkMode.title }} label="TV Series" {...a11yProps(1)} />
           </Tabs>
@@ -199,10 +199,16 @@ const Home = () => {
             </>
           ) : (
             <>
-              <ListMovies title={"Top Rated"} listMovies={movieTopRated} type="poster" genresMovie={genresMovie} />
-              <ListMovies title={"Now Playing"} listMovies={movieNowPlaying} type="lists" genresMovie={genresMovie} />
-              <ListMovies title={"Popular"} listMovies={moviePopular} type="lists" genresMovie={genresMovie} />
-              <ListMovies title={"Up Coming"} listMovies={movieUpComing} type="lists" genresMovie={genresMovie} />
+              <ListMovies
+                title={"Top Rated"}
+                listMovies={movieTopRated}
+                type="poster"
+                typeFilms={0}
+                genresMovie={genresMovie}
+              />
+              <ListMovies title={"Now Playing"} listMovies={movieNowPlaying} typeFilms={0} genresMovie={genresMovie} />
+              <ListMovies title={"Popular"} listMovies={moviePopular} typeFilms={0} genresMovie={genresMovie} />
+              <ListMovies title={"Up Coming"} listMovies={movieUpComing} typeFilms={0} genresMovie={genresMovie} />
             </>
           )}
         </CustomTabPanel>
@@ -224,10 +230,16 @@ const Home = () => {
             </>
           ) : (
             <>
-              <ListMovies title={"Top Rated"} listMovies={tvTopRated} type="poster" genresMovie={genresTV} />
-              <ListMovies title={"Airing Today"} listMovies={tvAiringToday} type="lists" genresMovie={genresTV} />
-              <ListMovies title={"On The Air"} listMovies={tvOnTheAir} type="lists" genresMovie={genresTV} />
-              <ListMovies title={"Popular"} listMovies={tvPopular} type="lists" genresMovie={genresTV} />
+              <ListMovies
+                title={"Top Rated"}
+                listMovies={tvTopRated}
+                type="poster"
+                typeFilms={1}
+                genresMovie={genresTV}
+              />
+              <ListMovies title={"Airing Today"} listMovies={tvAiringToday} typeFilms={1} genresMovie={genresTV} />
+              <ListMovies title={"On The Air"} listMovies={tvOnTheAir} typeFilms={1} genresMovie={genresTV} />
+              <ListMovies title={"Popular"} listMovies={tvPopular} typeFilms={1} genresMovie={genresTV} />
             </>
           )}
         </CustomTabPanel>
@@ -251,9 +263,9 @@ const Home = () => {
         {isLoading ? (
           <Typography>Loading genres ...</Typography>
         ) : typeFilms === 0 ? (
-          <SidebarRight movieTrending={movieTrending} genres={genresMovie} />
+          <SidebarRight movieTrending={movieTrending} typeFilms={typeFilms} genres={genresMovie} />
         ) : (
-          <SidebarRight movieTrending={tvTrending} genres={genresTV} />
+          <SidebarRight movieTrending={tvTrending} typeFilms={typeFilms} genres={genresTV} />
         )}
       </Box>
     </Box>

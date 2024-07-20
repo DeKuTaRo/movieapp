@@ -39,13 +39,15 @@ const ButtonNavBackdrop: React.FC = () => {
 const ListMovies = ({
   title,
   listMovies,
-  type,
+  type = "lists",
   genresMovie,
+  typeFilms,
 }: {
   title: string;
   listMovies: MovieDataType[];
-  type: string;
+  type?: string;
   genresMovie: GenresData[];
+  typeFilms: number;
 }) => {
   const swiperRef = useRef<SwiperClass>(null);
   const [isLastSlide, setIsLastSlide] = useState(false);
@@ -103,7 +105,7 @@ const ListMovies = ({
         {listMovies.map((movie, index) => {
           return (
             <SwiperSlide key={index} style={type !== "poster" ? { width: "175px" } : undefined}>
-              <Link href={`/movie/${movie.id}`} underline="none">
+              <Link href={`${typeFilms === 0 ? "/movie/" : "/tv/"}${movie.id}`} underline="none">
                 <Paper
                   elevation={0}
                   sx={

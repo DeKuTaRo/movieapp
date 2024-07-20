@@ -411,7 +411,7 @@ const Explore = () => {
             />
           </Box>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <Tabs value={typeFilms} onChange={handleChange} aria-label="basic tabs example">
+            <Tabs value={typeFilms} onChange={handleChange} aria-label="tab type movies">
               <Tab sx={{ color: "white" }} label="Movie" {...a11yProps(0)} />
               <Tab sx={{ color: "white" }} label="TV Series" {...a11yProps(1)} />
             </Tabs>

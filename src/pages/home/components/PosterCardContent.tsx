@@ -7,7 +7,7 @@ import "swiper/css/autoplay";
 import "swiper/css/mousewheel";
 import { MovieDataType, GenresData } from "../../../assets/data";
 import IconButton from "@mui/material/IconButton";
-import { Star, PlayCircleFilledWhiteOutlined, KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
+import { Star, PlayArrow, KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { themeDarkMode } from "../../../themes/ThemeProvider";
 
 const ButtonNavPoster = ({
@@ -185,7 +185,7 @@ const PosterCardContent = ({
         </Typography>
         <IconButton
           className="play-button"
-          aria-label="delete"
+          aria-label="play-button"
           sx={{
             position: "absolute",
             top: "41%",
@@ -195,7 +195,7 @@ const PosterCardContent = ({
             transitionDuration: "1s",
             transitionTimingFunction: "cubic-bezier(.4,0,.2,1)",
           }}>
-          <PlayCircleFilledWhiteOutlined
+          <PlayArrow
             sx={{
               backgroundImage: "linear-gradient(to bottom right,#5179ff,#c353b4)",
               padding: 2,

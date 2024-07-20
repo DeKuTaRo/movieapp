@@ -10,11 +10,20 @@ import {
   CardMedia,
   CardContent,
   Button,
+  Link,
 } from "@mui/material";
 import SearchIcon from "../../assets/icons/icon-search.svg";
 import { GenresData, MovieDataType } from "../../assets/data";
 import { themeDarkMode } from "../../themes/ThemeProvider";
-const SidebarRight = ({ genres, movieTrending }: { genres: GenresData[]; movieTrending: MovieDataType[] }) => {
+const SidebarRight = ({
+  genres,
+  typeFilms,
+  movieTrending,
+}: {
+  genres: GenresData[];
+  typeFilms: number;
+  movieTrending: MovieDataType[];
+}) => {
   return (
     <>
       <Paper
@@ -33,7 +42,6 @@ const SidebarRight = ({ genres, movieTrending }: { genres: GenresData[]; movieTr
           sx={{
             flex: 1,
             color: themeDarkMode.title,
-            border: "none",
           }}
           // value={search}
           // onChange={handleSearch}
@@ -76,24 +84,26 @@ const SidebarRight = ({ genres, movieTrending }: { genres: GenresData[]; movieTr
       <List>
         {movieTrending.slice(0, 2).map((movie) => (
           <ListItem>
-            <Card sx={{ display: "flex", backgroundColor: "transparent", color: "white" }}>
-              <CardMedia
-                component="img"
-                sx={{ width: "26%" }}
-                image={`https://image.tmdb.org/t/p/w342/${movie.backdrop_path}`}
-                alt={movie.title || movie.name}
-              />
-              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <CardContent sx={{ flex: "1 0 auto" }}>
-                  <Typography variant="subtitle1" noWrap>
-                    {movie.title || movie.name}
-                  </Typography>
-                  <Typography variant="subtitle2" sx={{ color: themeDarkMode.textColor }}>
-                    {movie.release_date || movie.first_air_date}
-                  </Typography>
-                </CardContent>
-              </Box>
-            </Card>
+            <Link href={`${typeFilms === 0 ? "/movie/" : "/tv/"}${movie.id}`} underline="none">
+              <Card sx={{ display: "flex", backgroundColor: "transparent", color: themeDarkMode.title }}>
+                <CardMedia
+                  component="img"
+                  sx={{ width: "26%" }}
+                  image={`https://image.tmdb.org/t/p/w342/${movie.backdrop_path}`}
+                  alt={movie.title || movie.name}
+                />
+                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <CardContent sx={{ flex: "1 0 auto" }}>
+                    <Typography variant="subtitle1" noWrap>
+                      {movie.title || movie.name}
+                    </Typography>
+                    <Typography variant="subtitle2" sx={{ color: themeDarkMode.textColor }}>
+                      {movie.release_date || movie.first_air_date}
+                    </Typography>
+                  </CardContent>
+                </Box>
+              </Card>
+            </Link>
           </ListItem>
         ))}
       </List>

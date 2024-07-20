@@ -22,7 +22,7 @@ const BackdropCardContent = ({ movie }: { movie: MovieDataType }) => {
           alt={movie.title || movie.name}
           style={{ width: "100%", height: "100%", borderRadius: "0.5rem" }}
         />
-        <Typography aria-label="movie rating" padding={0} textAlign={"center"} noWrap>
+        <Typography padding={0} textAlign={"center"} noWrap>
           {movie.title || movie.name}
         </Typography>
         <Typography
