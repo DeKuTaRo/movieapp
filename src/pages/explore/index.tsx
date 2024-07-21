@@ -35,12 +35,23 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import SidebarShorten from "../../components/sidebar/sidebarShorten";
 import { headers } from "../../utils";
+import CustomSkeleton from "../../components/Skeleton";
 
 const MovieItem: React.FC<{ movie: MovieDataType; typeFilm: number }> = ({ movie, typeFilm }) => (
   <Item>
     <Link href={`${typeFilm === 0 ? "/movie/" : "/tv/"}${movie.id}`} underline="none">
       <Paper elevation={0} sx={{ backgroundColor: "transparent", margin: 0 }}>
-        <Card variant="outlined" sx={{ bgcolor: "transparent", color: "#E0E0E0", border: "none" }}>
+        <Card
+          variant="outlined"
+          sx={{
+            bgcolor: "transparent",
+            color: themeDarkMode.title,
+            border: "none",
+            transition: "transform 0.3s ease-in-out",
+            "&:hover": {
+              transform: "scale(1.05)",
+            },
+          }}>
           <CardContent sx={{ p: 0, position: "relative" }}>
             <img
               src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
@@ -345,13 +356,27 @@ const Explore = () => {
           </Tabs>
         </Box>
         <CustomTabPanel value={typeFilms} index={0}>
-          <Grid container spacing={1} columns={15}>
-            {listsMovieSearch.map((movie, index) => (
-              <Grid item xs={3} key={movie.id} ref={index === listsMovieSearch.length - 1 ? lastMovieElementRef : null}>
-                <MovieItem movie={movie} typeFilm={0} />
-              </Grid>
-            ))}
-          </Grid>
+          {loading ? (
+            <Grid container spacing={1} columns={15} sx={{ marginLeft: "0.5rem" }}>
+              {Array.from({ length: 10 }).map((_, index) => (
+                <Grid item xs={3} key={index} sx={{ marginTop: "2rem", marginBottom: "2rem" }}>
+                  <CustomSkeleton variant="rounded" width={197} height={240} />
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <Grid container spacing={1} columns={15}>
+              {listsMovieSearch.map((movie, index) => (
+                <Grid
+                  item
+                  xs={3}
+                  key={movie.id}
+                  ref={index === listsMovieSearch.length - 1 ? lastMovieElementRef : null}>
+                  <MovieItem movie={movie} typeFilm={0} />
+                </Grid>
+              ))}
+            </Grid>
+          )}
         </CustomTabPanel>
         <CustomTabPanel value={typeFilms} index={1}>
           <div>TV series</div>
@@ -485,13 +510,13 @@ const Explore = () => {
                 max={200}
                 sx={{
                   "& .MuiSlider-rail": {
-                    backgroundColor: "black", // Color for the unselected range
+                    backgroundColor: "black",
                   },
                   "& .MuiSlider-track": {
-                    backgroundColor: "blue", // Color for the selected range
+                    backgroundColor: themeDarkMode.textPrimary,
                   },
                   "& .MuiSlider-thumb": {
-                    backgroundColor: "blue", // Color for the thumb
+                    backgroundColor: themeDarkMode.textPrimary,
                   },
                   maxWidth: "96%",
                   margin: "0 0.5rem",

@@ -115,7 +115,17 @@ const ListMovies = ({
                       ? { backgroundColor: "transparent" }
                       : { backgroundColor: "transparent", width: "160px" }
                   }>
-                  <Card variant="outlined" sx={{ bgcolor: "transparent", color: themeDarkMode.title, border: "none" }}>
+                  <Card
+                    variant="outlined"
+                    sx={{
+                      bgcolor: "transparent",
+                      color: themeDarkMode.title,
+                      border: "none",
+                      transition: type !== "poster" ? "transform 0.3s ease-in-out" : undefined,
+                      "&:hover": {
+                        transform: type !== "poster" ? "scale(1.1)" : undefined,
+                      },
+                    }}>
                     {type === "poster" ? (
                       <PosterCardContent
                         swiperRef={swiperRef}

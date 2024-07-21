@@ -24,7 +24,6 @@ import { MovieDataType } from "../../assets/data";
 
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { themeDarkMode } from "../../themes/ThemeProvider";
-import SidebarShorten from "../../components/sidebar/sidebarShorten";
 import GirlBackground from "../../assets/images/girl.png";
 import EmptyBackdrop from "../../assets/images/emptyBackdrop.jpg";
 import Sidebar from "../../components/sidebar";
@@ -52,7 +51,17 @@ const MovieItem: React.FC<{ movie: MovieDataType }> = ({ movie }) => {
         }`}
         underline="none">
         <Paper elevation={0} sx={{ backgroundColor: "transparent", margin: 0 }}>
-          <Card variant="outlined" sx={{ bgcolor: "transparent", color: "#E0E0E0", border: "none" }}>
+          <Card
+            variant="outlined"
+            sx={{
+              bgcolor: "transparent",
+              color: themeDarkMode.title,
+              border: "none",
+              transition: "transform 0.3s ease-in-out",
+              "&:hover": {
+                transform: "scale(1.05)",
+              },
+            }}>
             <CardContent sx={{ p: 0, position: "relative" }}>
               <img
                 src={getImageUrl(movie)}

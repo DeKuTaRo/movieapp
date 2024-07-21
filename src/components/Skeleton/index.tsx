@@ -10,6 +10,8 @@ interface SkeletonProps {
   heightBreakpoint?: string;
   marginTop?: string;
   marginBottom?: string;
+  marginLeft?: string;
+  marginRight?: string;
   fontSize?: string;
 }
 
@@ -22,6 +24,8 @@ const CustomSkeleton: React.FC<SkeletonProps> = ({
   heightBreakpoint,
   marginTop,
   marginBottom,
+  marginLeft,
+  marginRight,
   fontSize,
 }) => {
   return (
@@ -36,6 +40,8 @@ const CustomSkeleton: React.FC<SkeletonProps> = ({
         height: heightBreakpoint && { sm: heightBreakpoint[0], md: heightBreakpoint[1], lg: heightBreakpoint[2] },
         marginTop: marginTop,
         marginBottom: marginBottom,
+        marginLeft: marginLeft,
+        marginRight: marginRight,
         fontSize: fontSize,
       }}
     />

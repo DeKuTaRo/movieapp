@@ -769,6 +769,9 @@ const MovieDetails = () => {
                           backgroundColor: themeDarkMode.backgroundSidebar,
                           color: "white",
                           width: "100%",
+                          "&:hover": {
+                            opacity: "0.8",
+                          },
                         }}>
                         <CardMedia
                           component="img"

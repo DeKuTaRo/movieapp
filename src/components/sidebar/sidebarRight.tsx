@@ -95,7 +95,15 @@ const SidebarRight = ({
           {movieTrending.slice(0, 2).map((movie) => (
             <ListItem key={movie.id}>
               <Link href={`${typeFilms === 0 ? "/movie/" : "/tv/"}${movie.id}`} underline="none">
-                <Card sx={{ display: "flex", backgroundColor: "transparent", color: themeDarkMode.title }}>
+                <Card
+                  sx={{
+                    display: "flex",
+                    backgroundColor: "transparent",
+                    color: themeDarkMode.title,
+                    "&:hover": {
+                      opacity: "0.8",
+                    },
+                  }}>
                   <CardMedia
                     component="img"
                     sx={{ width: "26%" }}

@@ -31,7 +31,6 @@ function CustomTabPanel(props: TabPanelProps) {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
       {...other}>
-      {/* {value === index && <Box sx={{ p: 3, mb: 3 }}>{children}</Box>} */}
       {value === index && (
         <Box sx={{ p: 3, mb: 3 }}>
           {isLoading ? (
