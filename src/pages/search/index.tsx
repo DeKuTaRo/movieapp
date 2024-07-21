@@ -126,7 +126,7 @@ function Item(props: BoxProps) {
 }
 
 const minDistance = 20;
-const Explore = () => {
+const Search = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -323,7 +323,7 @@ const Explore = () => {
       <Box sx={{ width: "100%", padding: "2rem" }}>
         <Box sx={{ display: "flex" }}>
           <Typography variant="h3" sx={{ width: "75%" }}>
-            Find films that best fit to you
+            Search
           </Typography>
           <InputBase
             placeholder="Search here ..."
@@ -554,4 +554,4 @@ const Explore = () => {
   );
 };
 
-export default Explore;
+export default Search;

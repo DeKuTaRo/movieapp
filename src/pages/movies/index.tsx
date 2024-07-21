@@ -20,16 +20,17 @@ import {
 import SearchIcon from "../../assets/icons/icon-search.svg";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
-import { Link, useLocation, useParams } from "react-router-dom";
+import {  useLocation, useParams } from "react-router-dom";
 
 import EmptyBackDrop from "../../assets/images/emptyBackdrop.jpg";
-import { homeIcon, movieIcon, tvSeriesIcon, bookmarkIcon } from "../../assets";
 
 import axios from "axios";
 import { GenresData, MovieDataType, DetailCastMovie, DetailReviewMovie, DetailMediaMovie } from "../../assets/data";
 
 import { Star, StarBorder, StarHalf } from "@mui/icons-material";
 import { themeDarkMode } from "../../themes/ThemeProvider";
+import CustomSkeleton from "../../components/Skeleton";
+import SidebarShorten from "../../components/sidebar/sidebarShorten";
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -178,29 +179,6 @@ const NumberCircle: React.FC<NumberCircleProps> = ({ number }) => {
   );
 };
 
-const navLinks = [
-  {
-    name: "Home",
-    icon: homeIcon,
-    link: "/",
-  },
-  {
-    name: "Movies",
-    icon: movieIcon,
-    link: "/movies",
-  },
-  {
-    name: "TV Series",
-    icon: tvSeriesIcon,
-    link: "/tv-series",
-  },
-  {
-    name: "Bookmarks",
-    icon: bookmarkIcon,
-    link: "/bookmarks",
-  },
-];
-
 interface MediaProps {
   id: string;
   keyVideo: string;
@@ -273,7 +251,16 @@ const MovieDetails = () => {
     setMovieTab(newValue);
   };
 
-  const [detailsMovie, setDetailsMovie] = React.useState<MovieDataType | null>(null);
+  const [detailsMovie, setDetailsMovie] = React.useState<MovieDataType>({
+    id: "",
+    backdrop_path: "",
+    poster_path: "",
+    overview: "",
+    vote_average: "",
+    genre_ids: [],
+    tagline: "",
+    genres: [],
+  });
   const [detailCastsMovie, setDetailCastsMovie] = React.useState<DetailCastMovie[]>([]);
   const [detailReviewsMovie, setDetailReviewsMovie] = React.useState<DetailReviewMovie | null>(null);
   const [detailMediasMovie, setDetailMediasMovie] = React.useState<DetailMediaMovie | null>(null);
@@ -282,7 +269,6 @@ const MovieDetails = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        setIsLoading(true);
         const headers = {
           accept: "application/json",
           Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
@@ -352,63 +338,12 @@ const MovieDetails = () => {
           height: "100vh",
           overflowY: "hidden",
         }}>
-        <Box
-          sx={{
-            backgroundColor: themeDarkMode.backgroundSidebar,
-            padding: 2,
-            borderRadius: 2,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            width: {
-              sm: "100%",
-              lg: 40,
-            },
-          }}>
-          <Box
-            sx={{
-              py: {
-                xs: "0px",
-                lg: "16px",
-              },
-              display: "flex",
-              flexDirection: {
-                xs: "row",
-                lg: "column",
-              },
-              gap: 4,
-            }}>
-            {navLinks.map((item) => (
-              <Link key={item.name} to={item.link} style={{ textDecoration: "none" }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 2,
-                    color: "white",
-                    textDecoration: "none",
-                  }}>
-                  <img
-                    src={item.icon}
-                    alt={item.name}
-                    style={{
-                      width: "18px",
-                      filter: `${
-                        location.pathname === item.link
-                          ? "invert(58%) sepia(14%) saturate(3166%) hue-rotate(215deg) brightness(91%) contrast(87%)"
-                          : "invert(84%)"
-                      }`,
-                    }}
-                  />
-                </Box>
-              </Link>
-            ))}
-          </Box>
-        </Box>
+        <SidebarShorten />
 
-        {detailsMovie && (
-          <Box sx={{ width: "100%", overflowY: "scroll" }}>
+        <Box sx={{ width: "100%", overflowY: "scroll" }}>
+          {isLoading ? (
+            <CustomSkeleton variant="rounded" widthBreakPoint={["500px", "400px"]} />
+          ) : (
             <Box
               sx={{
                 position: "relative",
@@ -504,158 +439,181 @@ const MovieDetails = () => {
                 </Item>
               </Box>
             </Box>
-            <Box sx={{ display: "flex", flexGrow: 1, height: "550px" }}>
-              <Grid container>
-                <Grid
-                  item
-                  xs={2}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: 4,
-                    maxHeight: "400px",
-                    textAlign: "center",
-                  }}>
-                  <Box>
-                    <Typography>Rating</Typography>
+          )}
+          <Box sx={{ display: "flex", flexGrow: 1, height: "550px" }}>
+            <Grid container>
+              <Grid
+                item
+                xs={2}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 4,
+                  maxHeight: "400px",
+                  textAlign: "center",
+                }}>
+                <Box>
+                  <Typography>{isLoading ? <CustomSkeleton variant="text" fontSize="1rem" /> : "Rating"}</Typography>
+                  {isLoading ? (
+                    <CustomSkeleton variant="circular" width={45} height={45} />
+                  ) : (
                     <NumberCircle number={parseFloat(detailsMovie.vote_average)} />
+                  )}
+                </Box>
+                <Box>
+                  <Typography>{isLoading ? <CustomSkeleton variant="text" fontSize="1rem" /> : "EP Length"}</Typography>
+                  <Typography>
+                    {isLoading ? <CustomSkeleton variant="text" fontSize="1rem" /> : `${detailsMovie.runtime} mins`}
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={7}>
+                <Box>
+                  <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                    <Tabs value={movieTab} onChange={handleChangeTabMovie} aria-label="movie detail tab" centered>
+                      <Tab sx={{ color: "white" }} label="Overall" {...a11yProps(0)} />
+                      <Tab sx={{ color: "white" }} label="Cast" {...a11yProps(1)} />
+                      <Tab sx={{ color: "white" }} label="Reviews" {...a11yProps(2)} />
+                      {/* <Tab sx={{ color: "white" }} label="Seasons" {...a11yProps(2)} /> */}
+                    </Tabs>
                   </Box>
-                  <Box>
-                    <Typography>EP Length</Typography>
-                    <Typography sx={{ color: themeDarkMode.textColor }}>{detailsMovie.runtime} mins</Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={7}>
-                  <Box>
-                    <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                      <Tabs value={movieTab} onChange={handleChangeTabMovie} aria-label="movie detail tab" centered>
-                        <Tab sx={{ color: "white" }} label="Overall" {...a11yProps(0)} />
-                        <Tab sx={{ color: "white" }} label="Cast" {...a11yProps(1)} />
-                        <Tab sx={{ color: "white" }} label="Reviews" {...a11yProps(2)} />
-                        {/* <Tab sx={{ color: "white" }} label="Seasons" {...a11yProps(2)} /> */}
-                      </Tabs>
-                    </Box>
-                    <CustomTabPanel value={movieTab} index={0}>
-                      <Typography
-                        variant="h5"
-                        sx={{
-                          fontWeight: "bold",
-                          fontStyle: "italic",
-                        }}
-                        align="center">
-                        {detailsMovie.tagline}
-                      </Typography>
-                      <Typography
-                        variant="h5"
-                        sx={{
-                          fontWeight: "bold",
-                        }}>
-                        Story
-                      </Typography>
-                      <Typography
-                        variant="subtitle1"
-                        sx={{
-                          color: themeDarkMode.textColor,
-                          marginLeft: "1.5rem",
-                        }}>
-                        {detailsMovie.overview}
-                      </Typography>
-                      <Typography
-                        variant="h5"
-                        sx={{
-                          fontWeight: "bold",
-                        }}>
-                        Details
-                      </Typography>
-                      <Box sx={{ marginLeft: "1.5rem", color: themeDarkMode.textColor }}>
-                        <Typography variant="subtitle1">Status: {detailsMovie.status}</Typography>
-                        <Typography variant="subtitle1">
-                          {`Release date : ${detailsMovie.release_date}` ||
-                            `Last air date: ${detailsMovie.last_air_date}`}
+                  <CustomTabPanel value={movieTab} index={0}>
+                    {isLoading ? (
+                      <>
+                        <CustomSkeleton variant="text" fontSize="1rem" />
+                        <CustomSkeleton variant="text" fontSize="1rem" />
+                      </>
+                    ) : (
+                      <>
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: "bold",
+                            fontStyle: "italic",
+                          }}
+                          align="center">
+                          {detailsMovie.tagline}
                         </Typography>
-                        <Typography variant="subtitle1">{`Spoken language: ${
-                          detailsMovie.spoken_languages &&
-                          detailsMovie.spoken_languages.map((lang) => lang.english_name).join(", ")
-                        }`}</Typography>
-                      </Box>
-                    </CustomTabPanel>
-                    <CustomTabPanel value={movieTab} index={1}>
-                      <Grid container spacing={2} sx={{ height: "450px", overflowY: "scroll" }}>
-                        {detailCastsMovie &&
-                          detailCastsMovie.map((cast) => (
-                            <Grid item xs={6} key={cast.id}>
-                              <Item sx={{ display: "flex", alignItems: "center" }}>
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: "bold",
+                            width: "fit-content",
+                          }}>
+                          Story
+                        </Typography>
+                      </>
+                    )}
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        color: themeDarkMode.textColor,
+                        marginLeft: "1.5rem",
+                      }}>
+                      {isLoading ? <CustomSkeleton variant="text" fontSize="1rem" /> : detailsMovie.overview}
+                    </Typography>
+                    {isLoading ? (
+                      Array.from({ length: 4 }).map((_, index) => <CustomSkeleton variant="text" fontSize="1rem" />)
+                    ) : (
+                      <>
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: "bold",
+                          }}>
+                          Details
+                        </Typography>
+                        <Box sx={{ marginLeft: "1.5rem", color: themeDarkMode.textColor }}>
+                          <Typography variant="subtitle1">Status: {detailsMovie.status}</Typography>
+                          <Typography variant="subtitle1">
+                            {`Release date : ${detailsMovie.release_date}` ||
+                              `Last air date: ${detailsMovie.last_air_date}`}
+                          </Typography>
+                          <Typography variant="subtitle1">{`Spoken language: ${
+                            detailsMovie.spoken_languages &&
+                            detailsMovie.spoken_languages.map((lang) => lang.english_name).join(", ")
+                          }`}</Typography>
+                        </Box>
+                      </>
+                    )}
+                  </CustomTabPanel>
+                  <CustomTabPanel value={movieTab} index={1}>
+                    <Grid container spacing={2} sx={{ height: "450px", overflowY: "scroll" }}>
+                      {detailCastsMovie &&
+                        detailCastsMovie.map((cast) => (
+                          <Grid item xs={6} key={cast.id}>
+                            <Item sx={{ display: "flex", alignItems: "center" }}>
+                              <Avatar
+                                alt={cast.original_name}
+                                src={`https://image.tmdb.org/t/p/original/${cast.profile_path}`}
+                              />
+                              <Typography sx={{ marginLeft: "1rem" }}>{cast.name}</Typography>
+                            </Item>
+                          </Grid>
+                        ))}
+                    </Grid>
+                  </CustomTabPanel>
+                  <CustomTabPanel value={movieTab} index={2}>
+                    <Grid container spacing={1} sx={{ height: "400px", overflowY: "scroll", marginTop: "1rem" }}>
+                      {detailReviewsMovie && detailReviewsMovie.results.length > 0 ? (
+                        detailReviewsMovie.results.map((review) => (
+                          <React.Fragment key={review.id}>
+                            <Grid item xs={2}>
+                              <Item>
                                 <Avatar
-                                  alt={cast.original_name}
-                                  src={`https://image.tmdb.org/t/p/original/${cast.profile_path}`}
-                                />
-                                <Typography sx={{ marginLeft: "1rem" }}>{cast.name}</Typography>
+                                  alt={review.author}
+                                  src={
+                                    review.author_details.avatar_path
+                                      ? `https://image.tmdb.org/t/p/original/${review.author_details.avatar_path}`
+                                      : EmptyBackDrop
+                                  }
+                                  sx={{ width: 60, height: 60 }}
+                                />{" "}
                               </Item>
                             </Grid>
-                          ))}
-                      </Grid>
-                    </CustomTabPanel>
-                    <CustomTabPanel value={movieTab} index={2}>
-                      <Grid container spacing={1} sx={{ height: "400px", overflowY: "scroll", marginTop: "1rem" }}>
-                        {detailReviewsMovie && detailReviewsMovie.results.length > 0 ? (
-                          detailReviewsMovie.results.map((review) => (
-                            <React.Fragment key={review.id}>
-                              <Grid item xs={2}>
-                                <Item>
-                                  <Avatar
-                                    alt={review.author}
-                                    src={
-                                      review.author_details.avatar_path
-                                        ? `https://image.tmdb.org/t/p/original/${review.author_details.avatar_path}`
-                                        : EmptyBackDrop
-                                    }
-                                    sx={{ width: 60, height: 60 }}
-                                  />{" "}
-                                </Item>
-                              </Grid>
-                              <Grid item xs={10}>
-                                <Item>
-                                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                                    <Typography>
-                                      {review.author} ({review.author_details.username})
-                                    </Typography>
-                                    <Rating value={review.author_details.rating} />
-                                  </Box>
-
-                                  <Typography
-                                    variant="body2"
-                                    gutterBottom
-                                    sx={
-                                      toggleReview === review.id
-                                        ? undefined
-                                        : {
-                                            overflow: "hidden",
-                                            display: "-webkit-box",
-                                            WebkitLineClamp: 3,
-                                            WebkitBoxOrient: "vertical",
-                                          }
-                                    }>
-                                    {review.content}
+                            <Grid item xs={10}>
+                              <Item>
+                                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                                  <Typography>
+                                    {review.author} ({review.author_details.username})
                                   </Typography>
+                                  <Rating value={review.author_details.rating} />
+                                </Box>
 
-                                  <Button variant="outlined" onClick={() => handleShowFullReview(review.id)}>
-                                    {toggleReview === review.id ? "Show less" : "Show more"}
-                                  </Button>
-                                  <Typography align="right">{formatDateString(review.created_at)}</Typography>
-                                </Item>
-                              </Grid>
-                            </React.Fragment>
-                          ))
-                        ) : (
-                          <Typography align="center" sx={{ width: "100%" }}>
-                            There is no reviews yet
-                          </Typography>
-                        )}
-                      </Grid>
-                    </CustomTabPanel>
-                    {/* <CustomTabPanel value={value} index={3}>
+                                <Typography
+                                  variant="body2"
+                                  gutterBottom
+                                  sx={
+                                    toggleReview === review.id
+                                      ? undefined
+                                      : {
+                                          overflow: "hidden",
+                                          display: "-webkit-box",
+                                          WebkitLineClamp: 3,
+                                          WebkitBoxOrient: "vertical",
+                                        }
+                                  }>
+                                  {review.content}
+                                </Typography>
+
+                                <Button variant="outlined" onClick={() => handleShowFullReview(review.id)}>
+                                  {toggleReview === review.id ? "Show less" : "Show more"}
+                                </Button>
+                                <Typography align="right">{formatDateString(review.created_at)}</Typography>
+                              </Item>
+                            </Grid>
+                          </React.Fragment>
+                        ))
+                      ) : (
+                        <Typography align="center" sx={{ width: "100%" }}>
+                          There is no reviews yet
+                        </Typography>
+                      )}
+                    </Grid>
+                  </CustomTabPanel>
+                  {/* <CustomTabPanel value={value} index={3}>
                       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                         <Typography>Total seasons: 26</Typography>
                         <Typography>Total episodes: 694</Typography>
@@ -724,28 +682,38 @@ const MovieDetails = () => {
                         </Box>
                       </Box>
                     </CustomTabPanel> */}
-                  </Box>
-                </Grid>
-                <Grid item xs={3}>
-                  <h1>Media</h1>
-                  <Box sx={{ paddingRight: "0.75rem", height: "400px", overflowY: "scroll" }}>
-                    {!isLoading && detailMediasMovie && detailMediasMovie.results.length > 0 ? (
-                      detailMediasMovie.results.map((media) => (
-                        <Box key={media.id}>
-                          <MediaEmbed id={media.id} keyVideo={media.key} type={media.type} name={media.name} />
-                        </Box>
-                      ))
-                    ) : (
-                      <Typography align="center" sx={{ width: "100%" }}>
-                        There is no media available.
-                      </Typography>
-                    )}
-                  </Box>
-                </Grid>
+                </Box>
               </Grid>
-            </Box>
+              <Grid item xs={3}>
+                {isLoading ? (
+                  <>
+                    <CustomSkeleton variant="text" fontSize="1rem" />
+                    <CustomSkeleton variant="rectangular" height={140} />
+                    <CustomSkeleton variant="rectangular" height={140} />
+                  </>
+                ) : (
+                  <>
+                    <h1>Media</h1>
+                    <Box sx={{ paddingRight: "0.75rem", height: "400px", overflowY: "scroll" }}>
+                      {!isLoading && detailMediasMovie && detailMediasMovie.results.length > 0 ? (
+                        detailMediasMovie.results.map((media) => (
+                          <Box key={media.id}>
+                            <MediaEmbed id={media.id} keyVideo={media.key} type={media.type} name={media.name} />
+                          </Box>
+                        ))
+                      ) : (
+                        <Typography align="center" sx={{ width: "100%" }}>
+                          There is no media available.
+                        </Typography>
+                      )}
+                    </Box>
+                  </>
+                )}
+              </Grid>
+            </Grid>
           </Box>
-        )}
+        </Box>
+
         <Box
           sx={{
             backgroundColor: themeDarkMode.backgroundSidebar,
@@ -787,37 +755,65 @@ const MovieDetails = () => {
               }
             />
           </Paper>
-          <List sx={{ maxHeight: "90%", overflowY: "scroll", maxWidth: "100%" }}>
-            {detailSimilarMovie.map(
-              (movie) =>
-                movie.backdrop_path !== null && (
-                  <ListItem key={movie.id}>
-                    <Card
-                      sx={{
-                        display: "flex",
-                        backgroundColor: themeDarkMode.backgroundSidebar,
-                        color: "white",
-                        width: "100%",
-                      }}>
-                      <CardMedia
-                        component="img"
-                        sx={{ width: "26%" }}
-                        image={`https://image.tmdb.org/t/p/w342${movie.backdrop_path}`}
-                        alt={movie.title || movie.name}
-                      />
-                      <CardContent sx={{ display: "flex", flexDirection: "column" }}>
-                        <Typography variant="subtitle1" noWrap>
-                          {movie.title || movie.name}
-                        </Typography>
-                        <Typography variant="subtitle2" sx={{ color: themeDarkMode.textColor }}>
-                          {movie.release_date || movie.first_air_date}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </ListItem>
-                )
-            )}
-          </List>
+          {isLoading ? (
+            Array.from({ length: 5 }).map((_, index) => (
+              <CustomSkeleton keyItem={index} variant="rectangular" width={265} height={127} />
+            ))
+          ) : (
+            <List sx={{ maxHeight: "90%", overflowY: "scroll", maxWidth: "100%" }}>
+              {detailSimilarMovie.map(
+                (movie) =>
+                  movie.backdrop_path !== null && (
+                    <ListItem key={movie.id}>
+                      <Card
+                        sx={{
+                          display: "flex",
+                          backgroundColor: themeDarkMode.backgroundSidebar,
+                          color: "white",
+                          width: "100%",
+                        }}>
+                        <CardMedia
+                          component="img"
+                          sx={{ width: "26%" }}
+                          image={`https://image.tmdb.org/t/p/w342${movie.backdrop_path}`}
+                          alt={movie.title || movie.name}
+                        />
+                        <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                          <Typography variant="subtitle1" noWrap>
+                            {movie.title || movie.name}
+                          </Typography>
+                          <Typography variant="subtitle2" sx={{ color: themeDarkMode.textColor }}>
+                            {movie.release_date || movie.first_air_date}
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            component="span"
+                            sx={{
+                              padding: "0.125rem 0.625rem",
+                              backgroundColor: themeDarkMode.textPrimary,
+                              borderRadius: "0.5rem",
+                              display: "flex",
+                              alignItems: "center",
+                              width: "fit-content",
+                            }}>
+                            <Typography
+                              sx={{
+                                fontWeight: "bold",
+                                fontSize: "10px",
+                                marginRight: "0.125rem",
+                                marginTop: "0.125rem",
+                              }}>
+                              {parseFloat(movie.vote_average).toFixed(1)}
+                            </Typography>
+                            <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </ListItem>
+                  )
+              )}
+            </List>
+          )}
           <Button
             sx={{
               backgroundColor: themeDarkMode.backgroundColor,
@@ -826,7 +822,8 @@ const MovieDetails = () => {
               width: "80%",
               borderRadius: "1rem",
             }}
-            variant="outlined">
+            variant="outlined"
+            href="/explore">
             See more
           </Button>
         </Box>

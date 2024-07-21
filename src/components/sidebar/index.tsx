@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Box, Hidden, Typography } from "@mui/material";
-import { homeIcon, movieIcon, tvSeriesIcon, bookmarkIcon, exploreIcon } from "../../assets";
+import { homeIcon, movieIcon, tvSeriesIcon, bookmarkIcon, exploreIcon, searchIcon } from "../../assets";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 
 const navLinks = [
@@ -19,7 +19,7 @@ const navLinks = [
       },
       {
         name: "Search",
-        icon: exploreIcon,
+        icon: searchIcon,
         link: "/search",
       },
     ],

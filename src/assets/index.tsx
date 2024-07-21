@@ -4,4 +4,5 @@ import tvSeriesIcon from "./icons/icon-nav-tv-series.svg";
 import bookmarkIcon from "./icons/icon-nav-bookmark.svg";
 import exploreIcon from "./icons/icon-nav-explore.svg";
 import arrowDownIcon from "./icons/icon-arrow-down.svg";
-export { homeIcon, movieIcon, tvSeriesIcon, bookmarkIcon, exploreIcon, arrowDownIcon };
+import searchIcon from "./icons/icon-search.svg";
+export { homeIcon, movieIcon, tvSeriesIcon, bookmarkIcon, exploreIcon, arrowDownIcon, searchIcon };

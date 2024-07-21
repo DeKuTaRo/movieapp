@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Tabs, Tab, Typography, Skeleton } from "@mui/material";
+import { Box, Tabs, Tab, Grid } from "@mui/material";
 import axios from "axios";
 
 // Import Swiper styles
@@ -11,14 +11,16 @@ import { MovieDataType, GenresData } from "../../assets/data";
 import SidebarRight from "../../components/sidebar/sidebarRight";
 import Sidebar from "../../components/sidebar";
 import { themeDarkMode } from "../../themes/ThemeProvider";
+import CustomSkeleton from "../../components/Skeleton";
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
+  isLoading: boolean;
 }
 
 function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, isLoading, ...other } = props;
 
   return (
     <div
@@ -27,7 +29,28 @@ function CustomTabPanel(props: TabPanelProps) {
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
       {...other}>
-      {value === index && <Box sx={{ p: 3, mb: 3 }}>{children}</Box>}
+      {/* {value === index && <Box sx={{ p: 3, mb: 3 }}>{children}</Box>} */}
+      {value === index && (
+        <Box sx={{ p: 3, mb: 3 }}>
+          {isLoading ? (
+            <>
+              <CustomSkeleton width={152} height={60} marginBottom="42px" marginTop="21px" />
+              <CustomSkeleton height={508} marginTop="-112px" />
+              <CustomSkeleton width={152} height={60} marginBottom="42px" marginTop="21px" />
+
+              <Grid container spacing={2} columns={15}>
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <Grid item xs={3} key={index}>
+                    <CustomSkeleton variant="rounded" width={160} height={240} />
+                  </Grid>
+                ))}
+              </Grid>
+            </>
+          ) : (
+            children
+          )}
+        </Box>
+      )}
     </div>
   );
 }
@@ -40,7 +63,8 @@ function a11yProps(index: number) {
 }
 
 const Home = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoadingMovie, setIsLoadingMovie] = useState<boolean>(true);
+  const [isLoadingTV, setIsLoadingTV] = useState<boolean>(true);
   const [isFetchedMoviesData, setIsFetchedMoviesData] = useState<boolean>(false);
   const [isFetchedTVSeriesData, setIsFetchedTVSeriesData] = useState<boolean>(false);
   const [movieTopRated, setMovieTopRated] = useState<MovieDataType[]>([]);
@@ -59,15 +83,14 @@ const Home = () => {
   const [tvTrending, setTvTrending] = React.useState<MovieDataType[]>([]);
 
   const [typeFilms, setTypeFilms] = React.useState(0);
-  const handleChange = async (event: React.SyntheticEvent, newValue: number) => {
-    setTypeFilms(newValue);
+  const handleChangeFilmTab = async (event: React.SyntheticEvent, filmTab: number) => {
+    setTypeFilms(filmTab);
     const headers = {
       accept: "application/json",
       Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
     };
-    if (newValue === 0 && !isFetchedMoviesData) {
+    if (filmTab === 0 && !isFetchedMoviesData) {
       try {
-        setIsLoading(true);
         const [response1, response2, response3, response4, response5, response6] = await Promise.all([
           axios.get("https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1", { headers }),
           axios.get("https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=2", { headers }),
@@ -87,12 +110,10 @@ const Home = () => {
       } catch (err) {
         console.log("err = ", err);
       } finally {
-        setIsLoading(false);
+        setIsLoadingMovie(false);
       }
-    } else if (newValue === 1 && !isFetchedTVSeriesData) {
+    } else if (filmTab === 1 && !isFetchedTVSeriesData) {
       try {
-        setIsLoading(true);
-
         const [response1, response2, response3, response4, response5, response6] = await Promise.all([
           axios.get("https://api.themoviedb.org/3/tv/top_rated?language=en-US&page=1", { headers }),
           axios.get("https://api.themoviedb.org/3/tv/airing_today?language=en-US&page=2", { headers }),
@@ -115,7 +136,7 @@ const Home = () => {
       } catch (err) {
         console.log("err = ", err);
       } finally {
-        setIsLoading(false);
+        setIsLoadingTV(false);
       }
     }
   };
@@ -123,8 +144,6 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
-
         const headers = {
           accept: "application/json",
           Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
@@ -151,7 +170,7 @@ const Home = () => {
       } catch (error) {
         console.log("error = ", error);
       } finally {
-        setIsLoading(false);
+        setIsLoadingMovie(false);
       }
     };
 
@@ -176,72 +195,28 @@ const Home = () => {
       <Sidebar />
       <Box sx={{ width: "100%", overflowX: "hidden", overflowY: "scroll", padding: 2, marginTop: 1 }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs value={typeFilms} onChange={handleChange} aria-label="tab type movies">
+          <Tabs value={typeFilms} onChange={handleChangeFilmTab} aria-label="tab type movies">
             <Tab sx={{ color: themeDarkMode.title }} label="Movie" {...a11yProps(0)} />
             <Tab sx={{ color: themeDarkMode.title }} label="TV Series" {...a11yProps(1)} />
           </Tabs>
         </Box>
-        <CustomTabPanel value={typeFilms} index={0}>
-          {isLoading ? (
-            <>
-              <Skeleton
-                sx={{
-                  bgcolor: themeDarkMode.textColor,
-                  width: `152px`,
-                  height: `71px`,
-                  marginBottom: "42px",
-                  marginTop: "21px",
-                }}
-              />
-              <Box sx={{ height: "508px" }}>
-                <Skeleton sx={{ bgcolor: themeDarkMode.textColor, height: "847px", marginTop: "-211px" }} />
-              </Box>
-            </>
-          ) : (
-            <>
-              <ListMovies
-                title={"Top Rated"}
-                listMovies={movieTopRated}
-                type="poster"
-                typeFilms={0}
-                genresMovie={genresMovie}
-              />
-              <ListMovies title={"Now Playing"} listMovies={movieNowPlaying} typeFilms={0} genresMovie={genresMovie} />
-              <ListMovies title={"Popular"} listMovies={moviePopular} typeFilms={0} genresMovie={genresMovie} />
-              <ListMovies title={"Up Coming"} listMovies={movieUpComing} typeFilms={0} genresMovie={genresMovie} />
-            </>
-          )}
+        <CustomTabPanel value={typeFilms} index={0} isLoading={isLoadingMovie}>
+          <ListMovies
+            title={"Top Rated"}
+            listMovies={movieTopRated}
+            type="poster"
+            typeFilms={0}
+            genresMovie={genresMovie}
+          />
+          <ListMovies title={"Now Playing"} listMovies={movieNowPlaying} typeFilms={0} genresMovie={genresMovie} />
+          <ListMovies title={"Popular"} listMovies={moviePopular} typeFilms={0} genresMovie={genresMovie} />
+          <ListMovies title={"Up Coming"} listMovies={movieUpComing} typeFilms={0} genresMovie={genresMovie} />
         </CustomTabPanel>
-        <CustomTabPanel value={typeFilms} index={1}>
-          {isLoading ? (
-            <>
-              <Skeleton
-                sx={{
-                  bgcolor: themeDarkMode.textColor,
-                  width: `152px`,
-                  height: `71px`,
-                  marginBottom: "42px",
-                  marginTop: "21px",
-                }}
-              />
-              <Box sx={{ height: "508px" }}>
-                <Skeleton sx={{ bgcolor: themeDarkMode.textColor, height: "847px", marginTop: "-211px" }} />
-              </Box>
-            </>
-          ) : (
-            <>
-              <ListMovies
-                title={"Top Rated"}
-                listMovies={tvTopRated}
-                type="poster"
-                typeFilms={1}
-                genresMovie={genresTV}
-              />
-              <ListMovies title={"Airing Today"} listMovies={tvAiringToday} typeFilms={1} genresMovie={genresTV} />
-              <ListMovies title={"On The Air"} listMovies={tvOnTheAir} typeFilms={1} genresMovie={genresTV} />
-              <ListMovies title={"Popular"} listMovies={tvPopular} typeFilms={1} genresMovie={genresTV} />
-            </>
-          )}
+        <CustomTabPanel value={typeFilms} index={1} isLoading={isLoadingTV}>
+          <ListMovies title={"Top Rated"} listMovies={tvTopRated} type="poster" typeFilms={1} genresMovie={genresTV} />
+          <ListMovies title={"Airing Today"} listMovies={tvAiringToday} typeFilms={1} genresMovie={genresTV} />
+          <ListMovies title={"On The Air"} listMovies={tvOnTheAir} typeFilms={1} genresMovie={genresTV} />
+          <ListMovies title={"Popular"} listMovies={tvPopular} typeFilms={1} genresMovie={genresTV} />
         </CustomTabPanel>
       </Box>
       <Box
@@ -260,12 +235,15 @@ const Home = () => {
             lg: 450,
           },
         }}>
-        {isLoading ? (
-          <Typography>Loading genres ...</Typography>
-        ) : typeFilms === 0 ? (
-          <SidebarRight movieTrending={movieTrending} typeFilms={typeFilms} genres={genresMovie} />
+        {typeFilms === 0 ? (
+          <SidebarRight
+            isLoading={isLoadingMovie}
+            movieTrending={movieTrending}
+            typeFilms={typeFilms}
+            genres={genresMovie}
+          />
         ) : (
-          <SidebarRight movieTrending={tvTrending} typeFilms={typeFilms} genres={genresTV} />
+          <SidebarRight isLoading={isLoadingTV} movieTrending={tvTrending} typeFilms={typeFilms} genres={genresTV} />
         )}
       </Box>
     </Box>

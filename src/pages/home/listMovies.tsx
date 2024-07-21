@@ -37,12 +37,14 @@ const ButtonNavBackdrop: React.FC = () => {
 };
 
 const ListMovies = ({
+  isLoading,
   title,
   listMovies,
   type = "lists",
   genresMovie,
   typeFilms,
 }: {
+  isLoading?: boolean;
   title: string;
   listMovies: MovieDataType[];
   type?: string;

@@ -178,10 +178,10 @@ const PosterCardContent = ({
             display: "flex",
             alignItems: "center",
           }}>
-          <Typography sx={{ fontWeight: "bold", fontSize: "1rem", marginRight: 1 }}>
+          <Typography sx={{ fontWeight: "bold", fontSize: "0.75rem", marginRight: 0.5 }}>
             {parseFloat(movie.vote_average).toFixed(1)}
           </Typography>
-          <Star sx={{ width: "1rem", height: "1rem" }} />
+          <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
         </Typography>
         <IconButton
           className="play-button"

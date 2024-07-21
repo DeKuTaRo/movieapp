@@ -47,7 +47,7 @@ const BackdropCardContent = ({ movie }: { movie: MovieDataType }) => {
             }}>
             {parseFloat(movie.vote_average).toFixed(1)}
           </Typography>
-          <Star sx={{ width: "1rem", height: "1rem" }} />
+          <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
         </Typography>
       </CardContent>
     </>

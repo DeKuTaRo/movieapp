@@ -15,11 +15,16 @@ import {
 import SearchIcon from "../../assets/icons/icon-search.svg";
 import { GenresData, MovieDataType } from "../../assets/data";
 import { themeDarkMode } from "../../themes/ThemeProvider";
+import { Star } from "@mui/icons-material";
+import CustomSkeleton from "../Skeleton";
+
 const SidebarRight = ({
+  isLoading,
   genres,
   typeFilms,
   movieTrending,
 }: {
+  isLoading: boolean;
   genres: GenresData[];
   typeFilms: number;
   movieTrending: MovieDataType[];
@@ -52,7 +57,6 @@ const SidebarRight = ({
           }
         />
       </Paper>
-
       <Box
         sx={{
           display: "flex",
@@ -62,8 +66,8 @@ const SidebarRight = ({
           overflowY: "scroll",
         }}
         px={2}>
-        {genres.map((item) => {
-          return (
+        {(isLoading ? Array.from(new Array(12)) : genres).map((item) =>
+          item ? (
             <Typography
               key={item.id}
               variant="body2"
@@ -75,38 +79,66 @@ const SidebarRight = ({
               }}>
               {item.name}
             </Typography>
-          );
-        })}
+          ) : (
+            <CustomSkeleton width={57} height={36} />
+          )
+        )}
       </Box>
       <Typography variant="h5" component="h1" mb={1} align="left" sx={{ width: "100%", fontWeight: "bold" }}>
-        Trending
+        {isLoading ? <CustomSkeleton width={152} height={60} /> : "Trending"}
       </Typography>
-      <List>
-        {movieTrending.slice(0, 2).map((movie) => (
-          <ListItem>
-            <Link href={`${typeFilms === 0 ? "/movie/" : "/tv/"}${movie.id}`} underline="none">
-              <Card sx={{ display: "flex", backgroundColor: "transparent", color: themeDarkMode.title }}>
-                <CardMedia
-                  component="img"
-                  sx={{ width: "26%" }}
-                  image={`https://image.tmdb.org/t/p/w342/${movie.backdrop_path}`}
-                  alt={movie.title || movie.name}
-                />
-                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <CardContent sx={{ flex: "1 0 auto" }}>
+
+      {isLoading ? (
+        Array.from({ length: 2 }).map((_, index) => <CustomSkeleton variant="rectangular" width={265} height={127} />)
+      ) : (
+        <List>
+          {movieTrending.slice(0, 2).map((movie) => (
+            <ListItem key={movie.id}>
+              <Link href={`${typeFilms === 0 ? "/movie/" : "/tv/"}${movie.id}`} underline="none">
+                <Card sx={{ display: "flex", backgroundColor: "transparent", color: themeDarkMode.title }}>
+                  <CardMedia
+                    component="img"
+                    sx={{ width: "26%" }}
+                    image={`https://image.tmdb.org/t/p/w342/${movie.backdrop_path}`}
+                    alt={movie.title || movie.name}
+                  />
+
+                  <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                     <Typography variant="subtitle1" noWrap>
                       {movie.title || movie.name}
                     </Typography>
                     <Typography variant="subtitle2" sx={{ color: themeDarkMode.textColor }}>
                       {movie.release_date || movie.first_air_date}
                     </Typography>
+                    <Typography
+                      variant="body1"
+                      component="span"
+                      sx={{
+                        padding: "0.125rem 0.625rem",
+                        backgroundColor: themeDarkMode.textPrimary,
+                        borderRadius: "0.5rem",
+                        display: "flex",
+                        alignItems: "center",
+                        width: "fit-content",
+                      }}>
+                      <Typography
+                        sx={{
+                          fontWeight: "bold",
+                          fontSize: "10px",
+                          marginRight: "0.125rem",
+                          marginTop: "0.125rem",
+                        }}>
+                        {parseFloat(movie.vote_average).toFixed(1)}
+                      </Typography>
+                      <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
+                    </Typography>
                   </CardContent>
-                </Box>
-              </Card>
-            </Link>
-          </ListItem>
-        ))}
-      </List>
+                </Card>
+              </Link>
+            </ListItem>
+          ))}
+        </List>
+      )}
       <Button
         sx={{
           backgroundColor: themeDarkMode.backgroundColor,
@@ -115,7 +147,8 @@ const SidebarRight = ({
           width: "80%",
           borderRadius: "1rem",
         }}
-        variant="outlined">
+        variant="outlined"
+        href="/explore">
         See more
       </Button>
     </>

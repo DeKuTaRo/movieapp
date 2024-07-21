@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import { Home, Error, MovieDetails, Explore } from "./pages";
+import { Home, Error, MovieDetails, Explore, Search } from "./pages";
 
 export const router = createBrowserRouter([
   {
@@ -10,6 +10,11 @@ export const router = createBrowserRouter([
   {
     path: "/explore",
     element: <Explore />,
+    errorElement: <Error />,
+  },
+  {
+    path: "/search",
+    element: <Search />,
     errorElement: <Error />,
   },
   {
