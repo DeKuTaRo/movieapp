@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef, SyntheticEvent } from "react";
+import React, { useState } from "react";
 import {
   Paper,
   InputBase,
@@ -6,107 +6,91 @@ import {
   Typography,
   Button,
   Grid,
-  Slider,
   MenuItem,
-  Select,
-  SelectChangeEvent,
   Box,
   BoxProps,
   Card,
   CardContent,
   Collapse,
-  Tabs,
-  Tab,
   Link,
+  Pagination,
+  PaginationItem,
 } from "@mui/material";
 import SearchIcon from "../../assets/icons/icon-search.svg";
 import { Star } from "@mui/icons-material";
 
-import { useLocation, useNavigate } from "react-router-dom";
-
 import axios from "axios";
-import { GenresData, MovieDataType } from "../../assets/data";
+import { MovieDataType } from "../../assets/data";
 
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs, { Dayjs } from "dayjs";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import SidebarShorten from "../../components/sidebar/sidebarShorten";
+import GirlBackground from "../../assets/images/girl.png";
+import EmptyBackdrop from "../../assets/images/emptyBackdrop.jpg";
 
-const MovieItem: React.FC<{ movie: MovieDataType; typeFilm: number }> = ({ movie, typeFilm }) => (
-  <Item>
-    <Link href={`${typeFilm === 0 ? "/movie/" : "/tv/"}${movie.id}`} underline="none">
-      <Paper elevation={0} sx={{ backgroundColor: "transparent", margin: 0 }}>
-        <Card variant="outlined" sx={{ bgcolor: "transparent", color: "#E0E0E0", border: "none" }}>
-          <CardContent sx={{ p: 0, position: "relative" }}>
-            <img
-              src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
-              alt={movie.title}
-              style={{ width: "100%", height: "100%", borderRadius: "8px" }}
-            />
-            <Typography aria-label="movie rating" padding={0} textAlign={"center"}>
-              {movie.title}
-            </Typography>
-            <Typography
-              variant="body1"
-              component="span"
-              sx={{
-                position: "absolute",
-                top: "6%",
-                left: "10%",
-                padding: "0.125rem 0.625rem",
-                backgroundColor: themeDarkMode.textPrimary,
-                borderRadius: "0.5rem",
-                display: "flex",
-                alignItems: "center",
-              }}>
-              <Typography
-                sx={{
-                  fontWeight: "bold",
-                  fontSize: "10px",
-                  marginRight: "0.125rem",
-                  marginTop: "0.125rem",
-                }}>
-                {parseFloat(movie.vote_average).toFixed(1)}
-              </Typography>
-              <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
-            </Typography>
-          </CardContent>
-        </Card>
-      </Paper>
-    </Link>
-  </Item>
-);
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}>
-      {value === index && <Box sx={{ p: 1 }}>{children}</Box>}
-    </div>
-  );
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
+const MovieItem: React.FC<{ movie: MovieDataType }> = ({ movie }) => {
+  const getImageUrl = (movie: MovieDataType) => {
+    if (movie.poster_path) {
+      return `https://image.tmdb.org/t/p/w200/${movie.poster_path}`;
+    } else if (movie.profile_path) {
+      return `https://image.tmdb.org/t/p/w200/${movie.profile_path}`;
+    } else {
+      return EmptyBackdrop;
+    }
   };
-}
+  return (
+    <Item>
+      <Link
+        href={`${
+          movie.mediaType === "movie"
+            ? `/movie/${movie.id}`
+            : movie.mediaType === "tv"
+            ? `/tv/${movie.id}`
+            : `person/${movie.id}`
+        }`}
+        underline="none">
+        <Paper elevation={0} sx={{ backgroundColor: "transparent", margin: 0 }}>
+          <Card variant="outlined" sx={{ bgcolor: "transparent", color: "#E0E0E0", border: "none" }}>
+            <CardContent sx={{ p: 0, position: "relative" }}>
+              <img
+                src={getImageUrl(movie)}
+                alt={movie.title || movie.name}
+                style={{ width: "100%", height: "100%", borderRadius: "8px" }}
+              />
+              <Typography aria-label="movie rating" padding={0} textAlign={"center"} noWrap>
+                {movie.title || movie.name}
+              </Typography>
+              <Typography
+                variant="body1"
+                component="span"
+                sx={{
+                  position: "absolute",
+                  top: "6%",
+                  left: "10%",
+                  padding: "0.125rem 0.625rem",
+                  backgroundColor: themeDarkMode.textPrimary,
+                  borderRadius: "0.5rem",
+                  display: "flex",
+                  alignItems: "center",
+                }}>
+                <Typography
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: "10px",
+                    marginRight: "0.125rem",
+                    marginTop: "0.125rem",
+                  }}>
+                  {parseFloat(movie.vote_average).toFixed(1)}
+                </Typography>
+                <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
+              </Typography>
+            </CardContent>
+          </Card>
+        </Paper>
+      </Link>
+    </Item>
+  );
+};
 
 function Item(props: BoxProps) {
   const { sx, ...other } = props;
@@ -125,184 +109,62 @@ function Item(props: BoxProps) {
   );
 }
 
-const minDistance = 20;
 const Search = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const defaultSortBy = "popularity.desc";
-  const defaultRunTime = [0, 200];
-  const [sortBy, setSortBy] = useState<string>(defaultSortBy);
-  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
-  const [page, setPage] = useState(1);
-  const [runTime, setRunTime] = useState<number[]>(defaultRunTime);
-  const [runTimeUpdateURL, setRunTimeUpdateURL] = useState<number[]>(defaultRunTime);
-  const [selectedFromDate, setSelectedFromDate] = useState<Dayjs | null>(null);
-  const [selectedToDate, setSelectedToDate] = useState<Dayjs | null>(null);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-
-  const [listsMovieSearch, setListsMovieSearch] = React.useState<MovieDataType[]>([]);
-  const [listsTVShowSearch, setListsTVShowSearch] = React.useState<MovieDataType[]>([]);
-
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const observer = useRef<IntersectionObserver | null>(null);
-  const lastMovieElementRef = useCallback(
-    (node: HTMLElement | null) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setPage((prevPage) => prevPage + 1);
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore]
-  );
-
-  useEffect(() => {
-    setListsMovieSearch([]);
-    setPage(1);
-    setHasMore(true);
-  }, [location]);
-
-  useEffect(() => {
-    setLoading(true);
-    const fetchDetails = async () => {
-      try {
-        const headers = {
-          accept: "application/json",
-          Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
-        };
-
-        const [response1, response2] = await Promise.all([
-          axios.get("https://api.themoviedb.org/3/discover/movie", {
-            params: {
-              include_adult: false,
-              include_video: false,
-              language: "en-US",
-              page: page,
-              sort_by: sortBy,
-              with_genres: selectedGenres.toString(),
-              "with_runtime.gte": runTime[0],
-              "with_runtime.lte": runTime[1],
-              "primary_release_date.gte": selectedFromDate,
-              "primary_release_date.lte": selectedToDate,
-            },
-            headers,
-          }),
-          axios.get("https://api.themoviedb.org/3/discover/tv", {
-            params: {
-              include_adult: false,
-              include_video: false,
-              language: "en-US",
-              page: page,
-              sort_by: sortBy,
-              with_genres: selectedGenres.toString(),
-            },
-            headers,
-          }),
-        ]);
-        setListsMovieSearch((prevMovies) =>
-          page === 1 ? response1.data.results : [...prevMovies, ...response1.data.results]
-        );
-        setListsTVShowSearch((prevMovies) =>
-          page === 1 ? response2.data.results : [...prevMovies, ...response2.data.results]
-        );
-        setHasMore(response1.data.results.length > 0);
-        setLoading(false);
-      } catch (err) {
-        console.log("error: ", err);
-        setLoading(false);
-      }
-    };
-    fetchDetails();
-  }, [sortBy, selectedGenres, page, runTime, selectedFromDate, selectedToDate]);
-
-  const [typeFilms, setTypeFilms] = React.useState(0);
-  const handleChange = async (event: React.SyntheticEvent, newValue: number) => {
-    setTypeFilms(newValue);
+  const [searchInput, setSearchInput] = useState<string>("");
+  const [searchMovieShow, setSearchMovieShow] = useState<string>("");
+  const [listMovieSearch, setListMovieSearch] = useState<MovieDataType[]>([]);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [totalResults, setTotalResults] = useState<number>(0);
+  const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value);
   };
-  const [filterCollapse, setFilterCollapse] = React.useState(true);
+
   const [sortCollapse, setSortCollapse] = React.useState(true);
 
-  const handleChangeSortSearch = (event: SelectChangeEvent) => {
-    const updatedSortedby = event.target.value;
-    setSortBy(updatedSortedby);
-    setIsInitialLoad(false);
+  const [page, setPage] = React.useState(1);
+  const [typeSearch, setTypeSearch] = React.useState<string>("multi");
+
+  const handleChangeTypeSearch = (type: string) => {
+    setTypeSearch(type);
+    setPage(1);
+    fetchData(searchInput, 1, type);
   };
-  const handleChangeGenresSearch = (genreId: number) => {
-    setSelectedGenres((prev) => {
-      const updatedGenres = prev.includes(genreId) ? prev.filter((id) => id !== genreId) : [...prev, genreId];
-      return updatedGenres;
-    });
-    setIsInitialLoad(false);
-  };
-  const handleChangeRunTimeSearch = (event: Event, newValue: number | number[], activeThumb: number) => {
-    if (!Array.isArray(newValue)) {
-      return;
-    }
-    let updatedRunTime: number[];
-    if (activeThumb === 0) {
-      updatedRunTime = [Math.min(newValue[0], runTime[1] - minDistance), runTime[1]];
-    } else {
-      updatedRunTime = [runTime[0], Math.max(newValue[1], runTime[0] + minDistance)];
-    }
-    setRunTime(updatedRunTime);
-    setIsInitialLoad(false);
-  };
-  const handleChangeCommitted = (event: Event | SyntheticEvent<Element, Event>, newValue: number | number[]) => {
-    if (!Array.isArray(newValue)) {
-      return;
-    }
-    setRunTimeUpdateURL(newValue as number[]);
-    setIsInitialLoad(false);
-  };
-  const handleFromDateChange = (newValue: dayjs.Dayjs | null) => {
-    setSelectedFromDate(newValue);
-    setIsInitialLoad(false);
-  };
-  const handleToDateChange = (newValue: Dayjs | null) => {
-    setSelectedToDate(newValue);
-    setIsInitialLoad(false);
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+    fetchData(searchInput, value, typeSearch);
   };
 
-  useEffect(() => {
-    if (isInitialLoad) return;
-    const searchParams = new URLSearchParams();
-
-    if (sortBy !== defaultSortBy) {
-      searchParams.set("sort_by", sortBy);
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      fetchData(searchInput, page, typeSearch);
+      setSearchMovieShow(searchInput);
     }
+  };
 
-    selectedGenres.forEach((genre) => searchParams.append("genre", genre.toString()));
-
-    if (runTimeUpdateURL[0] !== defaultRunTime[0]) {
-      searchParams.set("minRuntime", runTimeUpdateURL[0].toString());
+  const fetchData = async (searchTerm: string, page: number, typeSearch: string) => {
+    try {
+      const headers = {
+        accept: "application/json",
+        Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
+      };
+      const response = await axios.get(`https://api.themoviedb.org/3/search/${typeSearch}`, {
+        params: {
+          query: searchTerm,
+          include_adult: false,
+          language: "en-US",
+          page: page,
+        },
+        headers,
+      });
+      setListMovieSearch(response.data.results);
+      setTotalPages(response.data.total_pages);
+      setTotalResults(response.data.total_results);
+      console.log("response = ", response);
+    } catch (err) {
+      console.log("err = ", err);
     }
+  };
 
-    if (runTimeUpdateURL[1] !== defaultRunTime[1]) {
-      searchParams.set("maxRuntime", runTimeUpdateURL[1].toString());
-    }
-
-    if (selectedFromDate) {
-      searchParams.set("from", selectedFromDate.format("YYYY-MM-DD"));
-    }
-
-    if (selectedToDate) {
-      searchParams.set("to", selectedToDate.format("YYYY-MM-DD"));
-    }
-
-    const search = searchParams.toString();
-    navigate(search ? `/explore?${search}` : "/explore", { replace: true });
-  }, [sortBy, selectedGenres, runTimeUpdateURL, selectedFromDate, selectedToDate]);
-
-  const genresMovieLocal: string | null = localStorage.getItem("genresMovieData");
-  const genresMovieData: GenresData[] = genresMovieLocal !== null && JSON.parse(genresMovieLocal);
-
-  const genresTVLocal: string | null = localStorage.getItem("genresTVData");
-  const genresTVData: GenresData[] = genresTVLocal !== null && JSON.parse(genresTVLocal);
   return (
     <Box
       sx={{
@@ -321,19 +183,32 @@ const Search = () => {
       <SidebarShorten />
 
       <Box sx={{ width: "100%", padding: "2rem" }}>
-        <Box sx={{ display: "flex" }}>
-          <Typography variant="h3" sx={{ width: "75%" }}>
-            Search
-          </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            height: "100%",
+            marginTop: listMovieSearch.length > 0 ? undefined : "8rem",
+          }}>
+          {listMovieSearch.length > 0 ? undefined : (
+            <Typography variant="h4" align="center">
+              Find your favourite movies, TV shows, people and more
+            </Typography>
+          )}
           <InputBase
             placeholder="Search here ..."
+            value={searchInput}
+            onChange={handleChangeSearch}
+            onKeyDown={handleKeyDown}
             sx={{
-              mx: 1,
-              flex: 1,
+              m: 2,
               color: "white",
               border: "1px solid #ccc",
               borderRadius: "1rem",
-              px: 1,
+              p: 2,
+              width: "50%",
+              textAlign: "center",
             }}
             startAdornment={
               <InputAdornment position="start">
@@ -341,36 +216,46 @@ const Search = () => {
               </InputAdornment>
             }
           />
-        </Box>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs value={typeFilms} onChange={handleChange} aria-label="tab type movies">
-            <Tab sx={{ color: "white" }} label="Movie" {...a11yProps(0)} />
-            <Tab sx={{ color: "white" }} label="TV Series" {...a11yProps(1)} />
-          </Tabs>
-        </Box>
-        <CustomTabPanel value={typeFilms} index={0}>
-          <Grid container spacing={1} columns={15}>
-            {listsMovieSearch.map((movie, index) => (
-              <Grid item xs={3} key={movie.id} ref={index === listsMovieSearch.length - 1 ? lastMovieElementRef : null}>
-                <MovieItem movie={movie} typeFilm={0} />
+          {listMovieSearch.length > 0 ? undefined : (
+            <img
+              src={GirlBackground}
+              alt={"Girl"}
+              style={{ borderRadius: "0.5rem", width: "70%", height: "400px", display: "block" }}
+            />
+          )}
+          {listMovieSearch.length > 0 ? (
+            <Typography align="left" sx={{ width: "100%" }}>
+              Search results for "{searchMovieShow}" ({totalResults} results found)
+            </Typography>
+          ) : undefined}
+          <Grid container spacing={1}>
+            {listMovieSearch.map((movie) => (
+              <Grid item xs={3}>
+                <MovieItem movie={movie} />
               </Grid>
             ))}
           </Grid>
-        </CustomTabPanel>
-        <CustomTabPanel value={typeFilms} index={1}>
-          <div>TV series</div>
-          <Grid container spacing={1} columns={15}>
-            {listsTVShowSearch.map((movie, index) => (
-              <Grid
-                item
-                xs={3}
-                key={movie.id}
-                ref={index === listsTVShowSearch.length - 1 ? lastMovieElementRef : null}>
-                <MovieItem movie={movie} typeFilm={1} />
-              </Grid>
-            ))}
-          </Grid>
-        </CustomTabPanel>
+          {listMovieSearch.length > 0 ? (
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handleChange}
+              renderItem={(item) => (
+                <PaginationItem
+                  {...item}
+                  sx={{
+                    marginBottom: 4,
+                    bgcolor: item.page === page ? "#5179ff !important" : "gray",
+                    color: item.page === page ? "white" : "orange",
+                    //   "&:hover": {
+                    //     bgcolor: item.page === page ? "#5179ff" : "gray",
+                    //   },
+                  }}
+                />
+              )}
+            />
+          ) : undefined}
+        </Box>
       </Box>
 
       {/* Sidebar Right */}
@@ -381,6 +266,7 @@ const Search = () => {
             xs: "row",
             lg: "column",
           },
+          justifyContent: "center",
           gap: 2,
           width: {
             sm: "100%",
@@ -389,164 +275,75 @@ const Search = () => {
           mt: 4,
           mr: 4,
         }}>
-        {/* Sort */}
-        <Box sx={{ backgroundColor: themeDarkMode.backgroundSidebar, padding: 2, borderRadius: 2 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h2>Sort</h2>
+        {/* Search filter */}
+        <Box
+          sx={{
+            backgroundColor: themeDarkMode.backgroundSidebar,
+            padding: 2,
+            borderRadius: 2,
+          }}>
+          <Box sx={{ display: "flex", justifyContent: "space-around", alignItems: "center" }}>
+            <h2>Search Results</h2>
             <Button
-              startIcon={<KeyboardArrowDownIcon />}
+              startIcon={<KeyboardArrowDownIcon width={40} height={40} />}
               sx={{ color: "white" }}
               onClick={() => setSortCollapse((prev) => !prev)}
             />
           </Box>
+
           {/* Sort collapse */}
+
           <Collapse in={sortCollapse}>
-            <h2>Sort results by</h2>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              fullWidth
-              onChange={handleChangeSortSearch}
-              sx={{ color: "white", backgroundColor: "#49494b", borderRadius: 2 }}
-              defaultValue="popularity.desc">
-              <MenuItem value="popularity.desc">Most popular</MenuItem>
-              <MenuItem value="vote_average.desc">Most rating</MenuItem>
-              <MenuItem value="release_date.desc">Most recent</MenuItem>
-            </Select>
-          </Collapse>
-        </Box>
-
-        {/* Filter */}
-        <Box sx={{ backgroundColor: themeDarkMode.backgroundSidebar, padding: 2, borderRadius: 2 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h2>Filter</h2>
-            <Button
-              startIcon={<KeyboardArrowDownIcon />}
-              sx={{ color: "white" }}
-              onClick={() => setFilterCollapse((prev) => !prev)}
-            />
-          </Box>
-
-          {/* Filter collapse */}
-          <Collapse in={filterCollapse}>
-            <h4>Genres</h4>
-            <Box
+            <Paper
               sx={{
+                padding: 2,
+                backgroundColor: "transparent",
+                color: themeDarkMode.title,
                 display: "flex",
-                flexWrap: "wrap",
-                gap: 2,
-                overflowY: "scroll",
-                maxHeight: "200px",
-                padding: "1rem",
+                flexDirection: "column",
+                alignItems: "center",
               }}>
-              {typeFilms === 0
-                ? genresMovieData.map((genre) => {
-                    return (
-                      <Typography
-                        key={genre.id}
-                        sx={{
-                          backgroundColor: selectedGenres.includes(genre.id) ? "blue" : "gray",
-                          padding: "0.5rem",
-                          borderRadius: "1rem",
-                        }}
-                        onClick={() => handleChangeGenresSearch(genre.id)}>
-                        {genre.name}
-                      </Typography>
-                    );
-                  })
-                : genresTVData.map((genre) => {
-                    return (
-                      <Typography
-                        key={genre.id}
-                        sx={{
-                          backgroundColor: selectedGenres.includes(12) ? "blue" : "gray",
-                          padding: "0.5rem",
-                          borderRadius: "1rem",
-                        }}
-                        onClick={() => handleChangeGenresSearch(12)}>
-                        {genre.name}
-                      </Typography>
-                    );
-                  })}
-            </Box>
-            {/* Run time */}
-            <h4>Run time</h4>
-            <Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <h5>From {runTime[0]} min</h5>
-                <h5>To {runTime[1]} min</h5>
-              </Box>
-              <Slider
-                value={runTime}
-                onChangeCommitted={handleChangeCommitted}
-                onChange={handleChangeRunTimeSearch}
-                valueLabelDisplay="off"
-                aria-labelledby="range-slider"
-                disableSwap
-                marks={[]}
-                step={10}
-                min={0}
-                max={200}
+              <MenuItem
                 sx={{
-                  "& .MuiSlider-rail": {
-                    backgroundColor: "black", // Color for the unselected range
-                  },
-                  "& .MuiSlider-track": {
-                    backgroundColor: "blue", // Color for the selected range
-                  },
-                  "& .MuiSlider-thumb": {
-                    backgroundColor: "blue", // Color for the thumb
-                  },
-                  maxWidth: "96%",
-                  margin: "0 0.5rem",
-                  padding: "0.5rem 0",
+                  width: "100%",
+                  justifyContent: "center",
+                  backgroundColor: typeSearch === "multi" ? "gray" : "transparent",
+                  borderRadius: "0.5rem",
                 }}
-              />
-            </Box>
-            {/* Realease date */}
-            <h4>Realease date</h4>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>From </div>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    value={selectedFromDate}
-                    onChange={handleFromDateChange}
-                    slotProps={{
-                      textField: {
-                        sx: {
-                          backgroundColor: "gray",
-                          borderRadius: "0.5rem",
-                          "& .MuiInputBase-input": {
-                            color: "white",
-                          },
-                        },
-                      },
-                    }}
-                  />
-                </LocalizationProvider>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>To </div>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    value={selectedToDate}
-                    onChange={handleToDateChange}
-                    slotProps={{
-                      textField: {
-                        sx: {
-                          backgroundColor: "gray",
-                          borderRadius: "0.5rem",
-                          "& .MuiInputBase-input": {
-                            color: "white",
-                          },
-                        },
-                      },
-                    }}
-                  />
-                </LocalizationProvider>
-              </Box>
-            </Box>
+                onClick={() => handleChangeTypeSearch("multi")}>
+                All
+              </MenuItem>
+              <MenuItem
+                sx={{
+                  width: "100%",
+                  justifyContent: "center",
+                  backgroundColor: typeSearch === "movie" ? "gray" : "transparent",
+                  borderRadius: "0.5rem",
+                }}
+                onClick={() => handleChangeTypeSearch("movie")}>
+                Movie
+              </MenuItem>
+              <MenuItem
+                sx={{
+                  width: "100%",
+                  justifyContent: "center",
+                  backgroundColor: typeSearch === "tv" ? "gray" : "transparent",
+                  borderRadius: "0.5rem",
+                }}
+                onClick={() => handleChangeTypeSearch("tv")}>
+                TV Show
+              </MenuItem>
+              <MenuItem
+                sx={{
+                  width: "100%",
+                  justifyContent: "center",
+                  backgroundColor: typeSearch === "person" ? "gray" : "transparent",
+                  borderRadius: "0.5rem",
+                }}
+                onClick={() => handleChangeTypeSearch("person")}>
+                People
+              </MenuItem>
+            </Paper>
           </Collapse>
         </Box>
       </Box>

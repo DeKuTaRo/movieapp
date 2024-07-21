@@ -17,6 +17,8 @@ export interface MovieDataType {
   last_air_date?: string;
   tagline: string;
   genres: GenresData[];
+  profile_path?: string;
+  mediaType?: string;
 }
 
 export interface GenresData {
