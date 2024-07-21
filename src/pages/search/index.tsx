@@ -27,6 +27,8 @@ import { themeDarkMode } from "../../themes/ThemeProvider";
 import SidebarShorten from "../../components/sidebar/sidebarShorten";
 import GirlBackground from "../../assets/images/girl.png";
 import EmptyBackdrop from "../../assets/images/emptyBackdrop.jpg";
+import Sidebar from "../../components/sidebar";
+import { headers } from "../../utils";
 
 const MovieItem: React.FC<{ movie: MovieDataType }> = ({ movie }) => {
   const getImageUrl = (movie: MovieDataType) => {
@@ -129,7 +131,7 @@ const Search = () => {
     setPage(1);
     fetchData(searchInput, 1, type);
   };
-  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
     fetchData(searchInput, value, typeSearch);
   };
@@ -143,10 +145,6 @@ const Search = () => {
 
   const fetchData = async (searchTerm: string, page: number, typeSearch: string) => {
     try {
-      const headers = {
-        accept: "application/json",
-        Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
-      };
       const response = await axios.get(`https://api.themoviedb.org/3/search/${typeSearch}`, {
         params: {
           query: searchTerm,
@@ -159,6 +157,7 @@ const Search = () => {
       setListMovieSearch(response.data.results);
       setTotalPages(response.data.total_pages);
       setTotalResults(response.data.total_results);
+      window.scrollTo(0, 0);
       console.log("response = ", response);
     } catch (err) {
       console.log("err = ", err);
@@ -180,7 +179,7 @@ const Search = () => {
         overflowY: "scroll",
         overflowX: "hidden",
       }}>
-      <SidebarShorten />
+      <Sidebar />
 
       <Box sx={{ width: "100%", padding: "2rem" }}>
         <Box
@@ -239,7 +238,7 @@ const Search = () => {
             <Pagination
               count={totalPages}
               page={page}
-              onChange={handleChange}
+              onChange={handleChangePage}
               renderItem={(item) => (
                 <PaginationItem
                   {...item}

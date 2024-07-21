@@ -20,7 +20,7 @@ import {
 import SearchIcon from "../../assets/icons/icon-search.svg";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
-import {  useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 import EmptyBackDrop from "../../assets/images/emptyBackdrop.jpg";
 
@@ -31,6 +31,8 @@ import { Star, StarBorder, StarHalf } from "@mui/icons-material";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import CustomSkeleton from "../../components/Skeleton";
 import SidebarShorten from "../../components/sidebar/sidebarShorten";
+import { headers } from "../../utils";
+
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -269,10 +271,6 @@ const MovieDetails = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const headers = {
-          accept: "application/json",
-          Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
-        };
         const [response1, response2, response3, response4, response5] = await Promise.all([
           axios.get(`https://api.themoviedb.org/3/${isMoviePath ? "movie" : "tv"}/${params.id}?language=en-US`, {
             headers,

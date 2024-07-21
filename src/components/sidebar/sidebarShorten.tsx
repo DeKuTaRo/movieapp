@@ -1,7 +1,7 @@
 import { Box, Link } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { themeDarkMode } from "../../themes/ThemeProvider";
-import { homeIcon, exploreIcon, tvSeriesIcon, bookmarkIcon } from "../../assets";
+import { homeIcon, exploreIcon, searchIcon, bookmarkIcon } from "../../assets";
 
 const navLinks = [
   {
@@ -15,9 +15,9 @@ const navLinks = [
     link: "/explore",
   },
   {
-    name: "TV Series",
-    icon: tvSeriesIcon,
-    link: "/tv-series",
+    name: "Search",
+    icon: searchIcon,
+    link: "/search",
   },
   {
     name: "Bookmarks",

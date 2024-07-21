@@ -12,6 +12,8 @@ import SidebarRight from "../../components/sidebar/sidebarRight";
 import Sidebar from "../../components/sidebar";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import CustomSkeleton from "../../components/Skeleton";
+import { headers } from "../../utils";
+
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -85,10 +87,7 @@ const Home = () => {
   const [typeFilms, setTypeFilms] = React.useState(0);
   const handleChangeFilmTab = async (event: React.SyntheticEvent, filmTab: number) => {
     setTypeFilms(filmTab);
-    const headers = {
-      accept: "application/json",
-      Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
-    };
+
     if (filmTab === 0 && !isFetchedMoviesData) {
       try {
         const [response1, response2, response3, response4, response5, response6] = await Promise.all([
@@ -144,10 +143,6 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const headers = {
-          accept: "application/json",
-          Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
-        };
         const [response1, response2, response3, response4, response5, response6] = await Promise.all([
           axios.get("https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1", { headers }),
           axios.get("https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=2", { headers }),

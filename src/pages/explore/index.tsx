@@ -34,6 +34,7 @@ import dayjs, { Dayjs } from "dayjs";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import SidebarShorten from "../../components/sidebar/sidebarShorten";
+import { headers } from "../../utils";
 
 const MovieItem: React.FC<{ movie: MovieDataType; typeFilm: number }> = ({ movie, typeFilm }) => (
   <Item>
@@ -171,11 +172,6 @@ const Explore = () => {
     setLoading(true);
     const fetchDetails = async () => {
       try {
-        const headers = {
-          accept: "application/json",
-          Authorization: `Bearer ${process.env.REACT_APP_API_TOKEN}`,
-        };
-
         const [response1, response2] = await Promise.all([
           axios.get("https://api.themoviedb.org/3/discover/movie", {
             params: {
