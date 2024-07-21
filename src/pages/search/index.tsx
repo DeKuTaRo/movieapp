@@ -28,6 +28,7 @@ import GirlBackground from "../../assets/images/girl.png";
 import EmptyBackdrop from "../../assets/images/emptyBackdrop.jpg";
 import Sidebar from "../../components/sidebar";
 import { headers } from "../../utils";
+import { KeyboardArrowLeft, KeyboardArrowRight, FirstPage, LastPage } from "@mui/icons-material";
 
 const MovieItem: React.FC<{ movie: MovieDataType }> = ({ movie }) => {
   const getImageUrl = (movie: MovieDataType) => {
@@ -248,19 +249,28 @@ const Search = () => {
               count={totalPages}
               page={page}
               onChange={handleChangePage}
-              renderItem={(item) => (
-                <PaginationItem
-                  {...item}
-                  sx={{
-                    marginBottom: 4,
-                    bgcolor: item.page === page ? "#5179ff !important" : "gray",
-                    color: item.page === page ? "white" : "orange",
-                    //   "&:hover": {
-                    //     bgcolor: item.page === page ? "#5179ff" : "gray",
-                    //   },
-                  }}
-                />
-              )}
+              showFirstButton
+              showLastButton
+              renderItem={(item) => {
+                const isSpecialButton = ["first", "last", "next", "previous"].includes(item.type);
+                return (
+                  <PaginationItem
+                    {...item}
+                    slots={{ previous: KeyboardArrowLeft, next: KeyboardArrowRight, first: FirstPage, last: LastPage }}
+                    sx={{
+                      marginBottom: 4,
+                      bgcolor:
+                        item.page === page || (isSpecialButton && !item.disabled)
+                          ? `${themeDarkMode.textPrimary} !important`
+                          : themeDarkMode.backgroundSidebar,
+                      color:
+                        item.page === page || (isSpecialButton && !item.disabled)
+                          ? themeDarkMode.title
+                          : themeDarkMode.textColor,
+                    }}
+                  />
+                );
+              }}
             />
           ) : undefined}
         </Box>
