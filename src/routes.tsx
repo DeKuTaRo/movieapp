@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import { Home, Error, MovieDetails, Explore, Search } from "./pages";
+import { Home, Error, MovieDetails, Explore, Search, Login } from "./pages";
 
 export const router = createBrowserRouter([
   {
@@ -15,6 +15,11 @@ export const router = createBrowserRouter([
   {
     path: "/search",
     element: <Search />,
+    errorElement: <Error />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
     errorElement: <Error />,
   },
   {

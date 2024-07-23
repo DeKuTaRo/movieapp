@@ -1,5 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
-import { Box, Hidden, Typography } from "@mui/material";
+import { useLocation } from "react-router-dom";
+import { Box, Hidden, Typography, Link } from "@mui/material";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import { HomeIcon, ExploreIcon, SearchIcon, BookmarkedIcon, HistoryIcon, ProfileIcon, LoginIcon } from "../icons";
 
@@ -118,7 +118,15 @@ const Sidebar = () => {
             </Typography>
             <Box sx={{ display: "flex", gap: 3, flexDirection: "column" }}>
               {item.itemLink.map((linkSidebar) => (
-                <Link key={linkSidebar.link} to={linkSidebar.link} style={{ textDecoration: "none" }}>
+                <Link
+                  key={linkSidebar.link}
+                  href={linkSidebar.link}
+                  sx={{
+                    textDecoration: "none",
+                    "&:hover": {
+                      opacity: pathname !== linkSidebar.link ? "0.7" : undefined,
+                    },
+                  }}>
                   <Box
                     sx={{
                       display: "flex",
