@@ -19,7 +19,7 @@ import {
   Tab,
   Link,
 } from "@mui/material";
-import SearchIcon from "../../assets/icons/icon-search.svg";
+import { SearchIcon } from "../../components/icons";
 import { Star } from "@mui/icons-material";
 
 import { useLocation, useNavigate } from "react-router-dom";
@@ -344,7 +344,7 @@ const Explore = () => {
             }}
             startAdornment={
               <InputAdornment position="start">
-                <img src={SearchIcon} alt="Search icon" width={20} height={20} />
+                <SearchIcon />
               </InputAdornment>
             }
           />

@@ -17,7 +17,7 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-import SearchIcon from "../../assets/icons/icon-search.svg";
+import { SearchIcon } from "../../components/icons";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
 import { useLocation, useParams } from "react-router-dom";
@@ -748,7 +748,7 @@ const MovieDetails = () => {
               // onChange={handleSearch}
               startAdornment={
                 <InputAdornment position="start">
-                  <img src={SearchIcon} alt="Search icon" width={20} height={20} />
+                  <SearchIcon />
                 </InputAdornment>
               }
             />

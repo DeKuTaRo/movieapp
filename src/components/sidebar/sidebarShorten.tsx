@@ -1,28 +1,50 @@
 import { Box, Link } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { themeDarkMode } from "../../themes/ThemeProvider";
-import { homeIcon, exploreIcon, searchIcon, bookmarkIcon } from "../../assets";
+import { HomeIcon, ExploreIcon, SearchIcon, BookmarkedIcon, HistoryIcon, ProfileIcon, LoginIcon } from "../icons";
 
 const navLinks = [
   {
     name: "Home",
-    icon: homeIcon,
+    icon: <HomeIcon />,
+    activeIcon: <HomeIcon color={themeDarkMode.textColorItemActiveSidebar} />,
     link: "/",
   },
   {
     name: "Explore",
-    icon: exploreIcon,
+    icon: <ExploreIcon />,
+    activeIcon: <ExploreIcon color={themeDarkMode.textColorItemActiveSidebar} />,
     link: "/explore",
   },
   {
     name: "Search",
-    icon: searchIcon,
+    icon: <SearchIcon />,
+    activeIcon: <SearchIcon color={themeDarkMode.textColorItemActiveSidebar} />,
     link: "/search",
   },
   {
-    name: "Bookmarks",
-    icon: bookmarkIcon,
+    name: "Bookmarked",
+    icon: <BookmarkedIcon />,
+    activeIcon: <BookmarkedIcon color={themeDarkMode.textColorItemActiveSidebar} />,
+    link: "/movies",
+  },
+  {
+    name: "History",
+    icon: <HistoryIcon />,
+    activeIcon: <HistoryIcon color={themeDarkMode.textColorItemActiveSidebar} />,
+    link: "/tv-series",
+  },
+  {
+    name: "Profile",
+    icon: <ProfileIcon />,
+    activeIcon: <ProfileIcon color={themeDarkMode.textColorItemActiveSidebar} />,
     link: "/bookmarks",
+  },
+  {
+    name: "Login",
+    icon: <LoginIcon />,
+    activeIcon: <LoginIcon color={themeDarkMode.textColorItemActiveSidebar} />,
+    link: "/login",
   },
 ];
 const SidebarShorten = () => {
@@ -65,18 +87,7 @@ const SidebarShorten = () => {
                 color: "white",
                 textDecoration: "none",
               }}>
-              <img
-                src={item.icon}
-                alt={item.name}
-                style={{
-                  width: "18px",
-                  filter: `${
-                    location.pathname === item.link
-                      ? "invert(58%) sepia(14%) saturate(3166%) hue-rotate(215deg) brightness(91%) contrast(87%)"
-                      : "invert(84%)"
-                  }`,
-                }}
-              />
+              {location.pathname === item.link ? item.activeIcon : item.icon}
             </Box>
           </Link>
         ))}

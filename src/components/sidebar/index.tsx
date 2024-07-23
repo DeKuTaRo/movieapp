@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Box, Hidden, Typography } from "@mui/material";
-import { homeIcon, movieIcon, tvSeriesIcon, bookmarkIcon, exploreIcon, searchIcon } from "../../assets";
 import { themeDarkMode } from "../../themes/ThemeProvider";
+import { HomeIcon, ExploreIcon, SearchIcon, BookmarkedIcon, HistoryIcon, ProfileIcon, LoginIcon } from "../icons";
 
 const navLinks = [
   {
@@ -9,33 +9,21 @@ const navLinks = [
     itemLink: [
       {
         name: "Home",
-        icon: homeIcon,
+        icon: <HomeIcon />,
+        activeIcon: <HomeIcon color={themeDarkMode.textColorItemActiveSidebar} />,
         link: "/",
       },
       {
         name: "Explore",
-        icon: exploreIcon,
+        icon: <ExploreIcon />,
+        activeIcon: <ExploreIcon color={themeDarkMode.textColorItemActiveSidebar} />,
         link: "/explore",
       },
       {
         name: "Search",
-        icon: searchIcon,
+        icon: <SearchIcon />,
+        activeIcon: <SearchIcon color={themeDarkMode.textColorItemActiveSidebar} />,
         link: "/search",
-      },
-    ],
-  },
-  {
-    title: "General",
-    itemLink: [
-      {
-        name: "Movies",
-        icon: movieIcon,
-        link: "/movies",
-      },
-      {
-        name: "TV Series",
-        icon: tvSeriesIcon,
-        link: "/tv-series",
       },
     ],
   },
@@ -43,13 +31,32 @@ const navLinks = [
     title: "Personal",
     itemLink: [
       {
-        name: "Bookmarks",
-        icon: bookmarkIcon,
+        name: "Bookmarked",
+        icon: <BookmarkedIcon />,
+        activeIcon: <BookmarkedIcon color={themeDarkMode.textColorItemActiveSidebar} />,
+        link: "/movies",
+      },
+      {
+        name: "History",
+        icon: <HistoryIcon />,
+        activeIcon: <HistoryIcon color={themeDarkMode.textColorItemActiveSidebar} />,
+        link: "/tv-series",
+      },
+    ],
+  },
+  {
+    title: "General",
+    itemLink: [
+      {
+        name: "Profile",
+        icon: <ProfileIcon />,
+        activeIcon: <ProfileIcon color={themeDarkMode.textColorItemActiveSidebar} />,
         link: "/bookmarks",
       },
       {
         name: "Login",
-        icon: bookmarkIcon,
+        icon: <LoginIcon />,
+        activeIcon: <LoginIcon color={themeDarkMode.textColorItemActiveSidebar} />,
         link: "/login",
       },
     ],
@@ -76,15 +83,16 @@ const Sidebar = () => {
             xs: "row",
             lg: "column",
           },
-          gap: 2,
+          gap: 4,
           alignItems: {
             xs: "center",
             lg: "start",
           },
           justifyContent: "center",
+          marginLeft: "1rem",
         }}>
         <Hidden smDown>
-          <Typography variant="h5" component="h1" mt={2} align="center" sx={{ width: "100%" }}>
+          <Typography variant="h5" component="h1" mt={2}>
             Choubeobeos
           </Typography>
         </Hidden>
@@ -104,7 +112,6 @@ const Sidebar = () => {
               },
               gap: 1,
               width: "100%",
-              marginLeft: "19px",
             }}>
             <Typography variant="h5" component="h1" mb={1}>
               {item.title}
@@ -119,25 +126,14 @@ const Sidebar = () => {
                       gap: 4,
                       paddingLeft: "1rem",
                     }}>
-                    <img
-                      src={linkSidebar.icon}
-                      alt={linkSidebar.name}
-                      style={{
-                        width: "18px",
-                        filter: `${
-                          pathname === linkSidebar.link
-                            ? "invert(58%) sepia(14%) saturate(3166%) hue-rotate(215deg) brightness(91%) contrast(87%)"
-                            : "invert(84%)"
-                        }`,
-                      }}
-                    />
+                    {pathname === linkSidebar.link ? linkSidebar.activeIcon : linkSidebar.icon}
                     <Hidden mdDown>
                       <Typography
                         sx={{
                           color: `${
                             pathname === linkSidebar.link
                               ? themeDarkMode.textColorItemActiveSidebar
-                              : themeDarkMode.textColorItemSidebar
+                              : themeDarkMode.title
                           }`,
                         }}>
                         {linkSidebar.name}

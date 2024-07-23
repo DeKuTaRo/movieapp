@@ -12,7 +12,7 @@ import {
   Button,
   Link,
 } from "@mui/material";
-import SearchIcon from "../../assets/icons/icon-search.svg";
+import { SearchIcon } from "../icons";
 import { GenresData, MovieDataType } from "../../assets/data";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import { Star } from "@mui/icons-material";
@@ -52,7 +52,7 @@ const SidebarRight = ({
           // onChange={handleSearch}
           startAdornment={
             <InputAdornment position="start">
-              <img src={SearchIcon} alt="Search icon" width={20} height={20} />
+              <SearchIcon />
             </InputAdornment>
           }
         />

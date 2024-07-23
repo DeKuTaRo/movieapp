@@ -16,7 +16,6 @@ import {
   Pagination,
   PaginationItem,
 } from "@mui/material";
-import SearchIcon from "../../assets/icons/icon-search.svg";
 import { Star } from "@mui/icons-material";
 
 import axios from "axios";
@@ -29,6 +28,7 @@ import EmptyBackdrop from "../../assets/images/emptyBackdrop.jpg";
 import Sidebar from "../../components/sidebar";
 import { headers } from "../../utils";
 import { KeyboardArrowLeft, KeyboardArrowRight, FirstPage, LastPage } from "@mui/icons-material";
+import { SearchIcon, ClearIcon } from "../../components/icons";
 
 const MovieItem: React.FC<{ movie: MovieDataType }> = ({ movie }) => {
   const getImageUrl = (movie: MovieDataType) => {
@@ -213,7 +213,7 @@ const Search = () => {
             sx={{
               m: 2,
               color: "white",
-              border: "1px solid #ccc",
+              border: `1px solid ${themeDarkMode.title}`,
               borderRadius: "1rem",
               p: 2,
               width: "50%",
@@ -221,7 +221,12 @@ const Search = () => {
             }}
             startAdornment={
               <InputAdornment position="start">
-                <img src={SearchIcon} alt="Search icon" width={20} height={20} />
+                <SearchIcon />
+              </InputAdornment>
+            }
+            endAdornment={
+              <InputAdornment position="start" sx={{ cursor: "pointer" }} onClick={() => setSearchInput("")}>
+                <ClearIcon />
               </InputAdornment>
             }
           />
