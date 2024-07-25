@@ -340,7 +340,11 @@ const MovieDetails = () => {
 
         <Box sx={{ width: "100%", overflowY: "scroll" }}>
           {isLoading ? (
-            <CustomSkeleton variant="rounded" widthBreakPoint={["500px", "400px"]} />
+            <CustomSkeleton
+              variant="rounded"
+              widthBreakPoint={["500px", "1300px"]}
+              heightBreakpoint={["400px", "400px"]}
+            />
           ) : (
             <Box
               sx={{

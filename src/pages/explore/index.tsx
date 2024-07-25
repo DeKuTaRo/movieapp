@@ -350,9 +350,17 @@ const Explore = () => {
           />
         </Box>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs value={typeFilms} onChange={handleChange} aria-label="tab type movies">
-            <Tab sx={{ color: "white" }} label="Movie" {...a11yProps(0)} />
-            <Tab sx={{ color: "white" }} label="TV Series" {...a11yProps(1)} />
+          <Tabs
+            value={typeFilms}
+            onChange={handleChange}
+            aria-label="tab type movies"
+            sx={{
+              "& .MuiTab-root": { color: themeDarkMode.title },
+              "& .Mui-selected": { color: `${themeDarkMode.textPrimary} !important` },
+              "& .MuiTabs-indicator": { backgroundColor: themeDarkMode.textPrimary },
+            }}>
+            <Tab label="Movie" {...a11yProps(0)} />
+            <Tab label="TV Series" {...a11yProps(1)} />
           </Tabs>
         </Box>
         <CustomTabPanel value={typeFilms} index={0}>
@@ -379,18 +387,27 @@ const Explore = () => {
           )}
         </CustomTabPanel>
         <CustomTabPanel value={typeFilms} index={1}>
-          <div>TV series</div>
-          <Grid container spacing={1} columns={15}>
-            {listsTVShowSearch.map((movie, index) => (
-              <Grid
-                item
-                xs={3}
-                key={movie.id}
-                ref={index === listsTVShowSearch.length - 1 ? lastMovieElementRef : null}>
-                <MovieItem movie={movie} typeFilm={1} />
-              </Grid>
-            ))}
-          </Grid>
+          {loading ? (
+            <Grid container spacing={1} columns={15} sx={{ marginLeft: "0.5rem" }}>
+              {Array.from({ length: 10 }).map((_, index) => (
+                <Grid item xs={3} key={index} sx={{ marginTop: "2rem", marginBottom: "2rem" }}>
+                  <CustomSkeleton variant="rounded" width={197} height={240} />
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <Grid container spacing={1} columns={15}>
+              {listsTVShowSearch.map((movie, index) => (
+                <Grid
+                  item
+                  xs={3}
+                  key={movie.id}
+                  ref={index === listsTVShowSearch.length - 1 ? lastMovieElementRef : null}>
+                  <MovieItem movie={movie} typeFilm={1} />
+                </Grid>
+              ))}
+            </Grid>
+          )}
         </CustomTabPanel>
       </Box>
 
@@ -428,7 +445,12 @@ const Explore = () => {
               id="demo-simple-select"
               fullWidth
               onChange={handleChangeSortSearch}
-              sx={{ color: "white", backgroundColor: "#49494b", borderRadius: 2 }}
+              sx={{
+                color: themeDarkMode.title,
+                backgroundColor: themeDarkMode.backgroundSidebar,
+                borderRadius: 2,
+                border: `1px solid ${themeDarkMode.title}`,
+              }}
               defaultValue="popularity.desc">
               <MenuItem value="popularity.desc">Most popular</MenuItem>
               <MenuItem value="vote_average.desc">Most rating</MenuItem>
@@ -460,35 +482,24 @@ const Explore = () => {
                 maxHeight: "200px",
                 padding: "1rem",
               }}>
-              {typeFilms === 0
-                ? genresMovieData.map((genre) => {
-                    return (
-                      <Typography
-                        key={genre.id}
-                        sx={{
-                          backgroundColor: selectedGenres.includes(genre.id) ? "blue" : "gray",
-                          padding: "0.5rem",
-                          borderRadius: "1rem",
-                        }}
-                        onClick={() => handleChangeGenresSearch(genre.id)}>
-                        {genre.name}
-                      </Typography>
-                    );
-                  })
-                : genresTVData.map((genre) => {
-                    return (
-                      <Typography
-                        key={genre.id}
-                        sx={{
-                          backgroundColor: selectedGenres.includes(12) ? "blue" : "gray",
-                          padding: "0.5rem",
-                          borderRadius: "1rem",
-                        }}
-                        onClick={() => handleChangeGenresSearch(12)}>
-                        {genre.name}
-                      </Typography>
-                    );
-                  })}
+              {(typeFilms === 0 ? genresMovieData : genresTVData).map((genre) => {
+                return (
+                  <Typography
+                    key={genre.id}
+                    sx={{
+                      backgroundColor: selectedGenres.includes(genre.id)
+                        ? themeDarkMode.textPrimary
+                        : themeDarkMode.backgroundSidebar,
+                      padding: "0.5rem",
+                      borderRadius: "1rem",
+                      border: `1px solid ${themeDarkMode.title}`,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleChangeGenresSearch(genre.id)}>
+                    {genre.name}
+                  </Typography>
+                );
+              })}
             </Box>
             {/* Run time */}
             <h4>Run time</h4>

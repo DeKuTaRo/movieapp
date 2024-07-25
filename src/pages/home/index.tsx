@@ -189,9 +189,17 @@ const Home = () => {
       <Sidebar />
       <Box sx={{ width: "100%", overflowX: "hidden", overflowY: "scroll", padding: 2, marginTop: 1 }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs value={typeFilms} onChange={handleChangeFilmTab} aria-label="tab type movies">
-            <Tab sx={{ color: themeDarkMode.title }} label="Movie" {...a11yProps(0)} />
-            <Tab sx={{ color: themeDarkMode.title }} label="TV Series" {...a11yProps(1)} />
+          <Tabs
+            value={typeFilms}
+            onChange={handleChangeFilmTab}
+            aria-label="tab type movies"
+            sx={{
+              "& .MuiTab-root": { color: themeDarkMode.title },
+              "& .Mui-selected": { color: `${themeDarkMode.textPrimary} !important` },
+              "& .MuiTabs-indicator": { backgroundColor: themeDarkMode.textPrimary },
+            }}>
+            <Tab label="Movie" {...a11yProps(0)} />
+            <Tab label="TV Series" {...a11yProps(1)} />
           </Tabs>
         </Box>
         <CustomTabPanel value={typeFilms} index={0} isLoading={isLoadingMovie}>

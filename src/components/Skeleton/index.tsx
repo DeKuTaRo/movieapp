@@ -7,7 +7,7 @@ interface SkeletonProps {
   width?: number;
   widthBreakPoint?: string[];
   height?: number;
-  heightBreakpoint?: string;
+  heightBreakpoint?: string[];
   marginTop?: string;
   marginBottom?: string;
   marginLeft?: string;
