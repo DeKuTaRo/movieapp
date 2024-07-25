@@ -262,6 +262,20 @@ const MovieDetails = () => {
     genre_ids: [],
     tagline: "",
     genres: [],
+    number_of_seasons: 0,
+    number_of_episodes: 0,
+    seasons: [
+      {
+        air_date: "",
+        episode_count: 0,
+        id: 0,
+        name: "",
+        overview: "",
+        poster_path: "",
+        season_number: 0,
+        vote_average: 0,
+      },
+    ],
   });
   const [detailCastsMovie, setDetailCastsMovie] = React.useState<DetailCastMovie[]>([]);
   const [detailReviewsMovie, setDetailReviewsMovie] = React.useState<DetailReviewMovie | null>(null);
@@ -394,39 +408,22 @@ const MovieDetails = () => {
                       flexWrap: "wrap",
                       gap: 2,
                     }}>
-                    {detailsMovie.genres.map((genre, index) =>
-                      isMoviePath
-                        ? genresMovieData.map(
-                            (localGenre) =>
-                              localGenre.id === genre.id && (
-                                <Typography
-                                  key={index}
-                                  sx={{
-                                    backgroundColor: "transparent",
-                                    padding: "0.75rem",
-                                    borderRadius: "1rem",
-                                    border: "1px solid",
-                                  }}>
-                                  {localGenre.name}
-                                </Typography>
-                              )
+                    {detailsMovie.genres.map((genre) =>
+                      (isMoviePath ? genresMovieData : genresTVData).map(
+                        (localGenre) =>
+                          localGenre.id === genre.id && (
+                            <Typography
+                              key={genre.id}
+                              sx={{
+                                backgroundColor: "transparent",
+                                padding: "0.75rem",
+                                borderRadius: "1rem",
+                                border: "1px solid",
+                              }}>
+                              {localGenre.name}
+                            </Typography>
                           )
-                        : genresTVData.map(
-                            (localGenre) =>
-                              localGenre.id === genre.id && (
-                                <Typography
-                                  key={index}
-                                  sx={{
-                                    backgroundColor: "transparent",
-                                    padding: "0.75rem",
-                                    borderRadius: "1rem",
-                                    color: "white",
-                                    border: "1px solid white",
-                                  }}>
-                                  {localGenre.name}
-                                </Typography>
-                              )
-                          )
+                      )
                     )}
                   </Box>
                 </Item>
@@ -467,18 +464,31 @@ const MovieDetails = () => {
                 <Box>
                   <Typography>{isLoading ? <CustomSkeleton variant="text" fontSize="1rem" /> : "EP Length"}</Typography>
                   <Typography>
-                    {isLoading ? <CustomSkeleton variant="text" fontSize="1rem" /> : `${detailsMovie.runtime} mins`}
+                    {isLoading ? (
+                      <CustomSkeleton variant="text" fontSize="1rem" />
+                    ) : (
+                      `${detailsMovie.runtime ? detailsMovie.runtime : ""} mins`
+                    )}
                   </Typography>
                 </Box>
               </Grid>
               <Grid item xs={7}>
                 <Box>
                   <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                    <Tabs value={movieTab} onChange={handleChangeTabMovie} aria-label="movie detail tab" centered>
-                      <Tab sx={{ color: "white" }} label="Overall" {...a11yProps(0)} />
-                      <Tab sx={{ color: "white" }} label="Cast" {...a11yProps(1)} />
-                      <Tab sx={{ color: "white" }} label="Reviews" {...a11yProps(2)} />
-                      {/* <Tab sx={{ color: "white" }} label="Seasons" {...a11yProps(2)} /> */}
+                    <Tabs
+                      value={movieTab}
+                      onChange={handleChangeTabMovie}
+                      aria-label="movie detail tab"
+                      centered
+                      sx={{
+                        "& .MuiTab-root": { color: themeDarkMode.title },
+                        "& .Mui-selected": { color: `${themeDarkMode.textPrimary} !important` },
+                        "& .MuiTabs-indicator": { backgroundColor: themeDarkMode.textPrimary },
+                      }}>
+                      <Tab label="Overall" {...a11yProps(0)} />
+                      <Tab label="Cast" {...a11yProps(1)} />
+                      <Tab label="Reviews" {...a11yProps(2)} />
+                      {!isMoviePath && <Tab label="Seasons" {...a11yProps(3)} />}
                     </Tabs>
                   </Box>
                   <CustomTabPanel value={movieTab} index={0}>
@@ -517,7 +527,9 @@ const MovieDetails = () => {
                       {isLoading ? <CustomSkeleton variant="text" fontSize="1rem" /> : detailsMovie.overview}
                     </Typography>
                     {isLoading ? (
-                      Array.from({ length: 4 }).map((_, index) => <CustomSkeleton variant="text" fontSize="1rem" />)
+                      Array.from({ length: 4 }).map((_, index) => (
+                        <CustomSkeleton keyItem={index} variant="text" fontSize="1rem" />
+                      ))
                     ) : (
                       <>
                         <Typography
@@ -530,8 +542,9 @@ const MovieDetails = () => {
                         <Box sx={{ marginLeft: "1.5rem", color: themeDarkMode.textColor }}>
                           <Typography variant="subtitle1">Status: {detailsMovie.status}</Typography>
                           <Typography variant="subtitle1">
-                            {`Release date : ${detailsMovie.release_date}` ||
-                              `Last air date: ${detailsMovie.last_air_date}`}
+                            {detailsMovie.release_date
+                              ? `Release date : ${detailsMovie.release_date}`
+                              : `Last air date: ${detailsMovie.last_air_date}`}
                           </Typography>
                           <Typography variant="subtitle1">{`Spoken language: ${
                             detailsMovie.spoken_languages &&
@@ -615,75 +628,66 @@ const MovieDetails = () => {
                       )}
                     </Grid>
                   </CustomTabPanel>
-                  {/* <CustomTabPanel value={value} index={3}>
-                      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                        <Typography>Total seasons: 26</Typography>
-                        <Typography>Total episodes: 694</Typography>
+                  {!isMoviePath && (
+                    <CustomTabPanel value={movieTab} index={3}>
+                      <Box sx={{ display: "flex", justifyContent: "space-between", p: 1 }}>
+                        <Typography>Total seasons: {detailsMovie.number_of_seasons}</Typography>
+                        <Typography>Total episodes: {detailsMovie.number_of_episodes}</Typography>
                       </Box>
                       <Box
-                        sx={{ height: "250px", overflowY: "scroll", display: "flex", flexDirection: "column", gap: 2 }}>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                          <img
-                            src={"https://image.tmdb.org/t/p/w200/c6MRUtPk0nEPQ9FBD9RdRKt2rIm.jpg"}
-                            style={{ borderRadius: "8px", width: "200px", height: "200px" }}
-                            alt=""
-                          />
-                          <Box>
-                            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                              <Typography>Specials</Typography>
-                              <Typography>203 episodes</Typography>
+                        sx={{ height: "380px", overflowY: "scroll", display: "flex", flexDirection: "column", gap: 2 }}>
+                        {detailsMovie.seasons &&
+                          detailsMovie.seasons.map((season) => (
+                            <Box key={season.id} sx={{ display: "flex", alignItems: "center", gap: 2, p: 2 }}>
+                              <img
+                                src={
+                                  season.poster_path
+                                    ? `https://image.tmdb.org/t/p/w200/${season.poster_path}`
+                                    : EmptyBackDrop
+                                }
+                                style={{ borderRadius: "0.5rem", width: "133px", height: "200px" }}
+                                alt={season.name}
+                              />
+                              <Box sx={{ width: "100%" }}>
+                                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                                  <Typography variant="h6">{season.name}</Typography>
+                                  <Typography>{season.episode_count} episodes</Typography>
+                                </Box>
+                                <Typography variant="subtitle2" p={1.5}>
+                                  {season.overview}
+                                </Typography>
+                                <Typography
+                                  variant="subtitle2"
+                                  component="div"
+                                  sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 2 }}>
+                                  <Typography
+                                    component="span"
+                                    sx={{
+                                      padding: "0.125rem 0.625rem",
+                                      backgroundColor: themeDarkMode.textPrimary,
+                                      borderRadius: "0.5rem",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      width: "fit-content",
+                                      gap: 0.5,
+                                    }}>
+                                    <Typography
+                                      sx={{
+                                        fontWeight: "bold",
+                                        fontSize: "12px",
+                                      }}>
+                                      {season.vote_average.toFixed(1)}
+                                    </Typography>
+                                    <Star sx={{ width: "1rem", height: "1rem" }} />
+                                  </Typography>
+                                  {season.air_date}
+                                </Typography>
+                              </Box>
                             </Box>
-                            <Typography>
-                              How do you review a show like Doctor Who that has been running for so long, enjoying
-                              dizzying highs and terrible lows I'm looking at you The Twin Dil How do you review a show
-                              like Doctor Who that has been running for so long, enjoying dizzying highs and terrible
-                              lows I'm looking at you The Twin Dil
-                            </Typography>
-                            <Typography>1991-08-26</Typography>
-                          </Box>
-                        </Box>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                          <img
-                            src={"https://image.tmdb.org/t/p/w200/c6MRUtPk0nEPQ9FBD9RdRKt2rIm.jpg"}
-                            style={{ borderRadius: "8px", width: "200px", height: "200px" }}
-                            alt=""
-                          />
-                          <Box>
-                            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                              <Typography>Specials</Typography>
-                              <Typography>203 episodes</Typography>
-                            </Box>
-                            <Typography>
-                              How do you review a show like Doctor Who that has been running for so long, enjoying
-                              dizzying highs and terrible lows I'm looking at you The Twin Dil How do you review a show
-                              like Doctor Who that has been running for so long, enjoying dizzying highs and terrible
-                              lows I'm looking at you The Twin Dil
-                            </Typography>
-                            <Typography>1991-08-26</Typography>
-                          </Box>
-                        </Box>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                          <img
-                            src={"https://image.tmdb.org/t/p/w200/c6MRUtPk0nEPQ9FBD9RdRKt2rIm.jpg"}
-                            style={{ borderRadius: "8px", width: "200px", height: "200px" }}
-                            alt=""
-                          />
-                          <Box>
-                            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                              <Typography>Specials</Typography>
-                              <Typography>203 episodes</Typography>
-                            </Box>
-                            <Typography>
-                              How do you review a show like Doctor Who that has been running for so long, enjoying
-                              dizzying highs and terrible lows I'm looking at you The Twin Dil How do you review a show
-                              like Doctor Who that has been running for so long, enjoying dizzying highs and terrible
-                              lows I'm looking at you The Twin Dil
-                            </Typography>
-                            <Typography>1991-08-26</Typography>
-                          </Box>
-                        </Box>
+                          ))}
                       </Box>
-                    </CustomTabPanel> */}
+                    </CustomTabPanel>
+                  )}
                 </Box>
               </Grid>
               <Grid item xs={3}>
@@ -773,6 +777,7 @@ const MovieDetails = () => {
                           backgroundColor: themeDarkMode.backgroundSidebar,
                           color: "white",
                           width: "100%",
+                          cursor: "pointer",
                           "&:hover": {
                             opacity: "0.8",
                           },
