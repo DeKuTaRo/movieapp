@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { Home, Error, MovieDetails, Explore, Search, Login } from "./pages";
+import PersonDetail from "./pages/movies/PersonDetail";
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +31,11 @@ export const router = createBrowserRouter([
   {
     path: "/tv/:id",
     element: <MovieDetails />,
+    errorElement: <Error />,
+  },
+  {
+    path: "/person/:id",
+    element: <PersonDetail />,
     errorElement: <Error />,
   },
 ]);

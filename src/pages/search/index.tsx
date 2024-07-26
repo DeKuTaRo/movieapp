@@ -92,7 +92,7 @@ const MovieItem: React.FC<{ movie: MovieDataType }> = ({ movie }) => {
                     marginRight: "0.125rem",
                     marginTop: "0.125rem",
                   }}>
-                  {parseFloat(movie.vote_average).toFixed(1)}
+                  {movie.vote_average && parseFloat(movie.vote_average).toFixed(1)}
                 </Typography>
                 <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
               </Typography>

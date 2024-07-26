@@ -119,16 +119,16 @@ const formatDateString = (dateString: string): string => {
 };
 
 interface NumberCircleProps {
-  number: number;
+  number: number | "" | undefined;
 }
 
 const NumberCircle: React.FC<NumberCircleProps> = ({ number }) => {
-  const roundedNumber = Math.round(number * 10) / 10;
+  const roundedNumber = number && Math.round(number * 10) / 10;
 
   const radius = 18;
   const circumference = 2 * Math.PI * radius;
-  const percentage = (roundedNumber / 10) * 100;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  const percentage = roundedNumber && (roundedNumber / 10) * 100;
+  const strokeDashoffset = percentage && circumference - (percentage / 100) * circumference;
   return (
     <Box
       sx={{
@@ -175,7 +175,7 @@ const NumberCircle: React.FC<NumberCircleProps> = ({ number }) => {
           fontFamily: "Arial, sans-serif",
           zIndex: 1,
         }}>
-        {roundedNumber.toFixed(1)}
+        {roundedNumber && roundedNumber.toFixed(1)}
       </Box>
     </Box>
   );
@@ -408,23 +408,24 @@ const MovieDetails = () => {
                       flexWrap: "wrap",
                       gap: 2,
                     }}>
-                    {detailsMovie.genres.map((genre) =>
-                      (isMoviePath ? genresMovieData : genresTVData).map(
-                        (localGenre) =>
-                          localGenre.id === genre.id && (
-                            <Typography
-                              key={genre.id}
-                              sx={{
-                                backgroundColor: "transparent",
-                                padding: "0.75rem",
-                                borderRadius: "1rem",
-                                border: "1px solid",
-                              }}>
-                              {localGenre.name}
-                            </Typography>
-                          )
-                      )
-                    )}
+                    {detailsMovie.genres &&
+                      detailsMovie.genres.map((genre) =>
+                        (isMoviePath ? genresMovieData : genresTVData).map(
+                          (localGenre) =>
+                            localGenre.id === genre.id && (
+                              <Typography
+                                key={genre.id}
+                                sx={{
+                                  backgroundColor: "transparent",
+                                  padding: "0.75rem",
+                                  borderRadius: "1rem",
+                                  border: "1px solid",
+                                }}>
+                                {localGenre.name}
+                              </Typography>
+                            )
+                        )
+                      )}
                   </Box>
                 </Item>
                 <Item sx={{ marginTop: "8rem" }}>
@@ -458,7 +459,7 @@ const MovieDetails = () => {
                   {isLoading ? (
                     <CustomSkeleton variant="circular" width={45} height={45} />
                   ) : (
-                    <NumberCircle number={parseFloat(detailsMovie.vote_average)} />
+                    <NumberCircle number={detailsMovie.vote_average && parseFloat(detailsMovie.vote_average)} />
                   )}
                 </Box>
                 <Box>
@@ -733,7 +734,7 @@ const MovieDetails = () => {
             alignItems: "center",
             width: {
               sm: "100%",
-              lg: 300,
+              lg: 420,
             },
           }}>
           <Paper
@@ -744,7 +745,7 @@ const MovieDetails = () => {
               borderRadius: "0.5rem",
               p: 1,
               backgroundColor: themeDarkMode.backgroundColor,
-              width: "80%",
+              width: "90%",
             }}>
             <InputBase
               placeholder="Search here ..."
@@ -761,6 +762,9 @@ const MovieDetails = () => {
               }
             />
           </Paper>
+          <Typography variant="h5" component="h1" align="left" sx={{ width: "100%", fontWeight: "bold" }}>
+            {isLoading ? <CustomSkeleton width={152} height={60} /> : "Similar"}
+          </Typography>
           {isLoading ? (
             Array.from({ length: 5 }).map((_, index) => (
               <CustomSkeleton keyItem={index} variant="rectangular" width={265} height={127} />
@@ -813,7 +817,7 @@ const MovieDetails = () => {
                                 marginRight: "0.125rem",
                                 marginTop: "0.125rem",
                               }}>
-                              {parseFloat(movie.vote_average).toFixed(1)}
+                              {movie.vote_average && parseFloat(movie.vote_average).toFixed(1)}
                             </Typography>
                             <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
                           </Typography>
@@ -829,7 +833,7 @@ const MovieDetails = () => {
               backgroundColor: themeDarkMode.backgroundColor,
               color: themeDarkMode.title,
               border: "none",
-              width: "80%",
+              width: "90%",
               borderRadius: "1rem",
             }}
             variant="outlined"

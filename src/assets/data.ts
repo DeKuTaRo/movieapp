@@ -4,19 +4,19 @@ export interface MovieDataType {
   name?: string;
   original_title?: string;
   original_name?: string;
-  backdrop_path: string;
-  poster_path: string;
-  overview: string;
+  backdrop_path?: string;
+  poster_path?: string;
+  overview?: string;
   release_date?: string;
   first_air_date?: string;
-  vote_average: string;
-  genre_ids: number[];
+  vote_average?: string;
+  genre_ids?: number[];
   runtime?: string;
   status?: string;
   spoken_languages?: Language[];
   last_air_date?: string;
-  tagline: string;
-  genres: GenresData[];
+  tagline?: string;
+  genres?: GenresData[];
   profile_path?: string;
   mediaType?: string;
   number_of_seasons?: number;
@@ -33,6 +33,16 @@ export interface MovieDataType {
       vote_average: number;
     }
   ];
+  popularity?: number;
+
+  // person detail
+  biography?: string;
+  birthday?: string;
+  deathday?: string;
+  gender?: number;
+  known_for_department?: string;
+  place_of_birth?: string;
+  media_type?: string;
 }
 
 export interface GenresData {
@@ -84,4 +94,22 @@ export interface DetailMediaMovie {
     key: string;
     type: string;
   }[];
+}
+
+export interface ExtenalIDs {
+  id: string;
+  imdb_id: string;
+  wikidata_id: string;
+  facebook_id: string;
+  instagram_id: string;
+  tiktok_id: string;
+  twitter_id: string;
+  youtube_id: string;
+}
+
+export enum Gender {
+  "Not set / not specified",
+  "Female",
+  "Male",
+  "Non-binary",
 }

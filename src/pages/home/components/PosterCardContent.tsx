@@ -133,24 +133,25 @@ const PosterCardContent = ({
               flexWrap: "wrap",
               gap: 2,
             }}>
-            {movie.genre_ids.map((id: number) =>
-              genresMovie.map(
-                (genres) =>
-                  genres.id === id && (
-                    <Typography
-                      key={id}
-                      sx={{
-                        backgroundColor: "transparent",
-                        color: themeDarkMode.title,
-                        padding: "0.5rem",
-                        borderRadius: "1rem",
-                        border: `1px solid ${themeDarkMode.textColor}`,
-                      }}>
-                      {genres.name}
-                    </Typography>
-                  )
-              )
-            )}
+            {movie.genre_ids &&
+              movie.genre_ids.map((id: number) =>
+                genresMovie.map(
+                  (genres) =>
+                    genres.id === id && (
+                      <Typography
+                        key={id}
+                        sx={{
+                          backgroundColor: "transparent",
+                          color: themeDarkMode.title,
+                          padding: "0.5rem",
+                          borderRadius: "1rem",
+                          border: `1px solid ${themeDarkMode.textColor}`,
+                        }}>
+                        {genres.name}
+                      </Typography>
+                    )
+                )
+              )}
           </Box>
           <Typography
             variant="subtitle1"
@@ -179,7 +180,7 @@ const PosterCardContent = ({
             alignItems: "center",
           }}>
           <Typography sx={{ fontWeight: "bold", fontSize: "0.75rem", marginRight: 0.5 }}>
-            {parseFloat(movie.vote_average).toFixed(1)}
+            {movie.vote_average && parseFloat(movie.vote_average).toFixed(1)}
           </Typography>
           <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
         </Typography>
