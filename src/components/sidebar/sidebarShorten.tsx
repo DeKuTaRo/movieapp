@@ -26,19 +26,19 @@ const navLinks = [
     name: "Bookmarked",
     icon: <BookmarkedIcon />,
     activeIcon: <BookmarkedIcon color={themeDarkMode.textColorItemActiveSidebar} />,
-    link: "/movies",
+    link: "/bookmarked",
   },
   {
     name: "History",
     icon: <HistoryIcon />,
     activeIcon: <HistoryIcon color={themeDarkMode.textColorItemActiveSidebar} />,
-    link: "/tv-series",
+    link: "/history",
   },
   {
     name: "Profile",
     icon: <ProfileIcon />,
     activeIcon: <ProfileIcon color={themeDarkMode.textColorItemActiveSidebar} />,
-    link: "/bookmarks",
+    link: "/profile",
   },
   {
     name: "Login",

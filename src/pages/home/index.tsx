@@ -186,7 +186,7 @@ const Home = () => {
         overflowY: "hidden",
         height: "100vh",
       }}>
-      <Sidebar />
+      <Sidebar page="homepage" />
       <Box sx={{ width: "100%", overflowX: "hidden", overflowY: "scroll", padding: 2, marginTop: 1 }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs

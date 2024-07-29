@@ -67,7 +67,7 @@ const MovieItem: React.FC<{ movie: MovieDataType }> = ({ movie }) => {
               <img
                 src={getImageUrl(movie)}
                 alt={movie.title || movie.name}
-                style={{ width: "100%", height: "100%", borderRadius: "8px" }}
+                style={{ width: 200, height: 300, borderRadius: 1 }}
               />
               <Typography aria-label="movie rating" padding={0} textAlign={"center"} noWrap>
                 {movie.title || movie.name}
@@ -184,191 +184,197 @@ const Search = () => {
           lg: "row",
         },
         color: themeDarkMode.title,
-        gap: 2,
+        overflowY: "hidden",
         height: "100vh",
-        overflowY: "scroll",
-        overflowX: "hidden",
       }}>
       <Sidebar />
 
-      <Box sx={{ width: "100%", padding: "2rem" }}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            height: "100%",
-            marginTop: listMovieSearch.length > 0 ? undefined : "8rem",
-          }}>
-          {listMovieSearch.length > 0 ? undefined : (
-            <Typography variant="h4" align="center">
-              Find your favourite movies, TV shows, people and more
-            </Typography>
-          )}
-          <InputBase
-            placeholder="Search here ..."
-            value={searchInput}
-            onChange={handleChangeSearch}
-            onKeyDown={handleKeyDown}
-            sx={{
-              m: 2,
-              color: "white",
-              border: `1px solid ${themeDarkMode.title}`,
-              borderRadius: "1rem",
-              p: 2,
-              width: "50%",
-              textAlign: "center",
-            }}
-            startAdornment={
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            }
-            endAdornment={
-              <InputAdornment position="start" sx={{ cursor: "pointer" }} onClick={() => setSearchInput("")}>
-                <ClearIcon />
-              </InputAdornment>
-            }
-          />
-          {listMovieSearch.length > 0 ? undefined : (
-            <img
-              src={GirlBackground}
-              alt={"Girl"}
-              style={{ borderRadius: "0.5rem", width: "70%", height: "400px", display: "block" }}
-            />
-          )}
-          {listMovieSearch.length > 0 ? (
-            <Typography align="left" sx={{ width: "100%" }}>
-              Search results for "{searchMovieShow}" ({totalResults} results found)
-            </Typography>
-          ) : undefined}
-          <Grid container spacing={1}>
-            {listMovieSearch.map((movie) => (
-              <Grid item xs={3}>
-                <MovieItem movie={movie} />
-              </Grid>
-            ))}
-          </Grid>
-          {listMovieSearch.length > 0 ? (
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={handleChangePage}
-              showFirstButton
-              showLastButton
-              renderItem={(item) => {
-                const isSpecialButton = ["first", "last", "next", "previous"].includes(item.type);
-                return (
-                  <PaginationItem
-                    {...item}
-                    slots={{ previous: KeyboardArrowLeft, next: KeyboardArrowRight, first: FirstPage, last: LastPage }}
-                    sx={{
-                      marginBottom: 4,
-                      bgcolor:
-                        item.page === page || (isSpecialButton && !item.disabled)
-                          ? `${themeDarkMode.textPrimary} !important`
-                          : themeDarkMode.backgroundSidebar,
-                      color:
-                        item.page === page || (isSpecialButton && !item.disabled)
-                          ? themeDarkMode.title
-                          : themeDarkMode.textColor,
-                    }}
-                  />
-                );
-              }}
-            />
-          ) : undefined}
-        </Box>
-      </Box>
-
-      {/* Sidebar Right */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: {
-            xs: "row",
-            lg: "column",
-          },
-          justifyContent: "center",
-          gap: 2,
-          width: {
-            sm: "100%",
-            lg: 450,
-          },
-          mt: 4,
-          mr: 4,
-        }}>
-        {/* Search filter */}
-        <Box
-          sx={{
-            backgroundColor: themeDarkMode.backgroundSidebar,
-            padding: 2,
-            borderRadius: 2,
-          }}>
-          <Box sx={{ display: "flex", justifyContent: "space-around", alignItems: "center" }}>
-            <h2>Search Results</h2>
-            <Button
-              startIcon={<KeyboardArrowDownIcon width={40} height={40} />}
-              sx={{ color: "white" }}
-              onClick={() => setSortCollapse((prev) => !prev)}
-            />
-          </Box>
-
-          {/* Sort collapse */}
-
-          <Collapse in={sortCollapse}>
-            <Paper
+      <Box sx={{ width: "100%", overflowX: "hidden", overflowY: "scroll" }}>
+        <Grid container spacing={1} sx={{}}>
+          <Grid item xs={9}>
+            <Box
               sx={{
-                padding: 2,
-                backgroundColor: "transparent",
-                color: themeDarkMode.title,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
+                marginTop: listMovieSearch.length > 0 ? undefined : "8rem",
               }}>
-              <MenuItem
+              {listMovieSearch.length > 0 ? undefined : (
+                <Typography variant="h4" align="center">
+                  Find your favourite movies, TV shows, people and more
+                </Typography>
+              )}
+              <InputBase
+                placeholder="Search here ..."
+                value={searchInput}
+                onChange={handleChangeSearch}
+                onKeyDown={handleKeyDown}
                 sx={{
-                  width: "100%",
-                  justifyContent: "center",
-                  backgroundColor: typeSearch === "multi" ? "gray" : "transparent",
-                  borderRadius: "0.5rem",
+                  m: 2,
+                  color: "white",
+                  border: `1px solid ${themeDarkMode.title}`,
+                  borderRadius: "1rem",
+                  p: 2,
+                  width: "50%",
+                  textAlign: "center",
                 }}
-                onClick={() => handleChangeTypeSearch("multi")}>
-                All
-              </MenuItem>
-              <MenuItem
+                startAdornment={
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                }
+                endAdornment={
+                  <InputAdornment position="start" sx={{ cursor: "pointer" }} onClick={() => setSearchInput("")}>
+                    <ClearIcon />
+                  </InputAdornment>
+                }
+              />
+              {listMovieSearch.length > 0 ? undefined : (
+                <img
+                  src={GirlBackground}
+                  alt={"Girl"}
+                  style={{ borderRadius: "0.5rem", width: "70%", height: "400px", display: "block" }}
+                />
+              )}
+              <Box sx={{ px: 5 }}>
+                {listMovieSearch.length > 0 ? (
+                  <Typography align="left" sx={{ width: "100%" }}>
+                    Search results for "{searchMovieShow}" ({totalResults} results found)
+                  </Typography>
+                ) : undefined}
+                <Grid container spacing={1}>
+                  {listMovieSearch.map((movie) => (
+                    <Grid item xs={3}>
+                      <MovieItem movie={movie} />
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+              {listMovieSearch.length > 0 ? (
+                <Pagination
+                  count={totalPages}
+                  page={page}
+                  onChange={handleChangePage}
+                  showFirstButton
+                  showLastButton
+                  renderItem={(item) => {
+                    const isSpecialButton = ["first", "last", "next", "previous"].includes(item.type);
+                    return (
+                      <PaginationItem
+                        {...item}
+                        slots={{
+                          previous: KeyboardArrowLeft,
+                          next: KeyboardArrowRight,
+                          first: FirstPage,
+                          last: LastPage,
+                        }}
+                        sx={{
+                          marginBottom: 4,
+                          bgcolor:
+                            item.page === page || (isSpecialButton && !item.disabled)
+                              ? `${themeDarkMode.textPrimary} !important`
+                              : themeDarkMode.backgroundSidebar,
+                          color:
+                            item.page === page || (isSpecialButton && !item.disabled)
+                              ? themeDarkMode.title
+                              : themeDarkMode.textColor,
+                        }}
+                      />
+                    );
+                  }}
+                />
+              ) : undefined}
+            </Box>
+          </Grid>
+          <Grid item xs={3}>
+            {/* Sidebar Right */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: {
+                  xs: "row",
+                  lg: "column",
+                },
+                gap: 2,
+                mr: 4,
+                mt: 16,
+              }}>
+              {/* Search filter */}
+              <Box
                 sx={{
-                  width: "100%",
-                  justifyContent: "center",
-                  backgroundColor: typeSearch === "movie" ? "gray" : "transparent",
-                  borderRadius: "0.5rem",
-                }}
-                onClick={() => handleChangeTypeSearch("movie")}>
-                Movie
-              </MenuItem>
-              <MenuItem
-                sx={{
-                  width: "100%",
-                  justifyContent: "center",
-                  backgroundColor: typeSearch === "tv" ? "gray" : "transparent",
-                  borderRadius: "0.5rem",
-                }}
-                onClick={() => handleChangeTypeSearch("tv")}>
-                TV Show
-              </MenuItem>
-              <MenuItem
-                sx={{
-                  width: "100%",
-                  justifyContent: "center",
-                  backgroundColor: typeSearch === "person" ? "gray" : "transparent",
-                  borderRadius: "0.5rem",
-                }}
-                onClick={() => handleChangeTypeSearch("person")}>
-                People
-              </MenuItem>
-            </Paper>
-          </Collapse>
-        </Box>
+                  backgroundColor: themeDarkMode.backgroundSidebar,
+                  padding: 1,
+                  borderRadius: 2,
+                }}>
+                <Box sx={{ display: "flex", justifyContent: "space-around" }}>
+                  <Typography variant="h5" component="h1" my={2} sx={{ fontWeight: "bold" }}>
+                    Search Results
+                  </Typography>
+                  <Button
+                    startIcon={<KeyboardArrowDownIcon width={20} height={20} />}
+                    sx={{ color: themeDarkMode.title }}
+                    onClick={() => setSortCollapse((prev) => !prev)}
+                  />
+                </Box>
+
+                {/* Sort collapse */}
+
+                <Collapse in={sortCollapse}>
+                  <Paper
+                    sx={{
+                      padding: 2,
+                      backgroundColor: "transparent",
+                      color: themeDarkMode.title,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}>
+                    <MenuItem
+                      sx={{
+                        width: "100%",
+                        justifyContent: "center",
+                        backgroundColor: typeSearch === "multi" ? "gray" : "transparent",
+                        borderRadius: "0.5rem",
+                      }}
+                      onClick={() => handleChangeTypeSearch("multi")}>
+                      All
+                    </MenuItem>
+                    <MenuItem
+                      sx={{
+                        width: "100%",
+                        justifyContent: "center",
+                        backgroundColor: typeSearch === "movie" ? "gray" : "transparent",
+                        borderRadius: "0.5rem",
+                      }}
+                      onClick={() => handleChangeTypeSearch("movie")}>
+                      Movie
+                    </MenuItem>
+                    <MenuItem
+                      sx={{
+                        width: "100%",
+                        justifyContent: "center",
+                        backgroundColor: typeSearch === "tv" ? "gray" : "transparent",
+                        borderRadius: "0.5rem",
+                      }}
+                      onClick={() => handleChangeTypeSearch("tv")}>
+                      TV Show
+                    </MenuItem>
+                    <MenuItem
+                      sx={{
+                        width: "100%",
+                        justifyContent: "center",
+                        backgroundColor: typeSearch === "person" ? "gray" : "transparent",
+                        borderRadius: "0.5rem",
+                      }}
+                      onClick={() => handleChangeTypeSearch("person")}>
+                      People
+                    </MenuItem>
+                  </Paper>
+                </Collapse>
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   );

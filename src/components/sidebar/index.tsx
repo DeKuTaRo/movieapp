@@ -34,13 +34,13 @@ const navLinks = [
         name: "Bookmarked",
         icon: <BookmarkedIcon />,
         activeIcon: <BookmarkedIcon color={themeDarkMode.textColorItemActiveSidebar} />,
-        link: "/movies",
+        link: "/bookmarked",
       },
       {
         name: "History",
         icon: <HistoryIcon />,
         activeIcon: <HistoryIcon color={themeDarkMode.textColorItemActiveSidebar} />,
-        link: "/tv-series",
+        link: "/history",
       },
     ],
   },
@@ -51,7 +51,7 @@ const navLinks = [
         name: "Profile",
         icon: <ProfileIcon />,
         activeIcon: <ProfileIcon color={themeDarkMode.textColorItemActiveSidebar} />,
-        link: "/bookmarks",
+        link: "/profile",
       },
       {
         name: "Login",
@@ -63,7 +63,11 @@ const navLinks = [
   },
 ];
 
-const Sidebar = () => {
+interface SidebarProps {
+  page?: string;
+}
+
+const Sidebar = ({ page }: SidebarProps) => {
   const { pathname } = useLocation();
 
   return (
@@ -73,7 +77,7 @@ const Sidebar = () => {
         padding: 2,
         width: {
           sm: "100%",
-          lg: 300,
+          lg: page === "homepage" ? 300 : 235,
         },
       }}>
       <Box

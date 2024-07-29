@@ -1,6 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
-import { Home, Error, MovieDetails, Explore, Search, Login } from "./pages";
+import { Home, Error, MovieDetails, Explore, Search, Login, Bookmarked } from "./pages";
 import PersonDetail from "./pages/movies/PersonDetail";
+import History from "./pages/history";
+import Profile from "./pages/profile";
 
 export const router = createBrowserRouter([
   {
@@ -21,6 +23,21 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+    errorElement: <Error />,
+  },
+  {
+    path: "/bookmarked",
+    element: <Bookmarked />,
+    errorElement: <Error />,
+  },
+  {
+    path: "/history",
+    element: <History />,
+    errorElement: <Error />,
+  },
+  {
+    path: "/profile",
+    element: <Profile />,
     errorElement: <Error />,
   },
   {
