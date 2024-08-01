@@ -113,3 +113,19 @@ export enum Gender {
   "Male",
   "Non-binary",
 }
+
+export interface User {
+  displayName?: string | null;
+  email?: string | null;
+  emailVerified?: boolean;
+  photoURL?: string | null;
+  uid?: string;
+}
+
+export interface CredentialsProps {
+  firstName?: string;
+  lastName?: string;
+  displayName?: string | null;
+  email: string;
+  password: string;
+}

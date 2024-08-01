@@ -6,25 +6,57 @@ import IconButton from "@mui/material/IconButton";
 interface TextFieldProps {
   margin?: "dense" | "none" | "normal";
   name?: string;
+  label?: string;
   id?: string;
   placeholder?: string;
   type?: string;
+  value?: string | number | null;
+  required?: boolean;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: boolean;
+  helperText?: React.ReactNode;
+  helperTextColor?: string;
   iconStart?: React.ReactNode;
   iconEnd?: React.ReactNode;
 }
 
-export const TextFieldCustom = ({ margin, name, id, placeholder, type, iconStart, iconEnd }: TextFieldProps) => {
+export const TextFieldCustom = ({
+  margin,
+  name,
+  label,
+  id,
+  placeholder,
+  type,
+  value,
+  required,
+  onChange,
+  error,
+  helperText,
+  helperTextColor,
+  iconStart,
+  iconEnd,
+}: TextFieldProps) => {
   return (
     <TextField
       margin={margin}
       autoComplete={name}
       name={name}
-      required
+      label={label}
+      required={required}
+      helperText={helperText}
       fullWidth
       id={id}
       placeholder={placeholder}
       autoFocus
       type={type}
+      value={value}
+      onChange={onChange}
+      FormHelperTextProps={{
+        sx: { color: helperTextColor },
+      }}
+      InputLabelProps={{
+        sx: { color: themeDarkMode.textPrimary, fontSize: "1.25rem", fontWeight: "700" },
+      }}
       sx={{
         "& .MuiOutlinedInput-root": {
           backgroundColor: themeDarkMode.backgroundSidebar,
@@ -45,7 +77,7 @@ export const TextFieldCustom = ({ margin, name, id, placeholder, type, iconStart
         },
         "& .MuiInputBase-input::placeholder": {
           color: themeDarkMode.title,
-          opacity: 1,
+          opacity: 0.5,
         },
       }}
       InputProps={{

@@ -66,7 +66,7 @@ const SidebarRight = ({
           overflowY: "scroll",
         }}
         px={2}>
-        {(isLoading ? Array.from(new Array(12)) : genres).map((item) =>
+        {(isLoading ? Array.from(new Array(12)) : genres).map((item, index) =>
           item ? (
             <Typography
               key={item.id}
@@ -80,7 +80,7 @@ const SidebarRight = ({
               {item.name}
             </Typography>
           ) : (
-            <CustomSkeleton width={57} height={36} />
+            <CustomSkeleton keyItem={index} width={57} height={36} />
           )
         )}
       </Box>
@@ -89,7 +89,9 @@ const SidebarRight = ({
       </Typography>
 
       {isLoading ? (
-        Array.from({ length: 2 }).map((_, index) => <CustomSkeleton variant="rectangular" width={265} height={127} />)
+        Array.from({ length: 2 }).map((_, index) => (
+          <CustomSkeleton keyItem={index} variant="rectangular" width={265} height={127} />
+        ))
       ) : (
         <List>
           {movieTrending.slice(0, 2).map((movie) => (

@@ -1,12 +1,35 @@
 import React from "react";
 import { Box, Grid, Typography, Button, Avatar } from "@mui/material";
-
 import Sidebar from "../../components/sidebar";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import { TextFieldCustom } from "../../components/TextField";
 import GirlBackground from "../../assets/images/girl.png";
+import { useAppSelector } from "../../hooks";
+import { auth } from "../../firebase";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { User } from "../../assets/data";
+
+const validationSchema = Yup.object({
+  email: Yup.string().email("Invalid email address").required("Required"),
+  password: Yup.string().min(8, "Must be at least 8 characters").required("Required"),
+});
 
 const Profile = () => {
+  const currentUser = useAppSelector((state) => state.auth.user);
+  console.log("currentUser", currentUser);
+
+  const formik = useFormik<User>({
+    initialValues: {
+      email: currentUser?.email,
+      displayName: currentUser?.displayName,
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      console.log("values = ", values);
+      // handleSignIn(values);
+    },
+  });
   return (
     <Box
       sx={{
@@ -37,13 +60,19 @@ const Profile = () => {
             <Typography variant="h5" component="h1" my={3} align="left" sx={{ fontWeight: "bold" }}>
               Email
             </Typography>
-            <TextFieldCustom id="email" name="email" placeholder="Your email here" />
+            <TextFieldCustom id="email" name="email" placeholder="Your email here" value={formik.values.email} />
             <Typography variant="h5" component="h1" my={3} align="left" sx={{ fontWeight: "bold" }}>
               Name
             </Typography>
-            <TextFieldCustom id="name" name="name" placeholder="Your name here" />
-            <Typography variant="h5" component="h1" my={3} align="left" sx={{ fontWeight: "bold" }}>
-              Your email is verified.
+            <TextFieldCustom id="name" name="name" placeholder="Your name here" value={formik.values.displayName} />
+            <Typography
+              variant="h5"
+              component="h1"
+              my={3}
+              align="left"
+              sx={{ fontWeight: "bold", display: "flex", justifyContent: "space-between" }}>
+              Your email is {formik.values.emailVerified ? "verified" : "not verified"}.
+              {!formik.values.emailVerified && <Button variant="outlined">Verified email</Button>}
             </Typography>
             <Typography variant="h5" component="h1" my={3} align="left" sx={{ fontWeight: "bold" }}>
               Change password

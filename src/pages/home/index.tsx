@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Tabs, Tab, Grid } from "@mui/material";
+import { Box, Tabs, Tab, Grid, Typography, Avatar } from "@mui/material";
 import axios from "axios";
 
 // Import Swiper styles
@@ -13,6 +13,8 @@ import Sidebar from "../../components/sidebar";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import CustomSkeleton from "../../components/Skeleton";
 import { headers } from "../../utils";
+import { useAppSelector } from "../../hooks";
+import GirlBackground from "../../assets/images/girl.png";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -32,7 +34,7 @@ function CustomTabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}>
       {value === index && (
-        <Box sx={{ p: 3, mb: 3 }}>
+        <Box sx={{ p: 1, mb: 3 }}>
           {isLoading ? (
             <>
               <CustomSkeleton width={152} height={60} marginBottom="42px" marginTop="21px" />
@@ -64,6 +66,8 @@ function a11yProps(index: number) {
 }
 
 const Home = () => {
+  const currentUser = useAppSelector((state) => state.auth.user);
+  console.log("currentUser", currentUser);
   const [isLoadingMovie, setIsLoadingMovie] = useState<boolean>(true);
   const [isLoadingTV, setIsLoadingTV] = useState<boolean>(true);
   const [isFetchedMoviesData, setIsFetchedMoviesData] = useState<boolean>(false);
@@ -188,19 +192,27 @@ const Home = () => {
       }}>
       <Sidebar page="homepage" />
       <Box sx={{ width: "100%", overflowX: "hidden", overflowY: "scroll", padding: 2, marginTop: 1 }}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={typeFilms}
-            onChange={handleChangeFilmTab}
-            aria-label="tab type movies"
-            sx={{
-              "& .MuiTab-root": { color: themeDarkMode.title },
-              "& .Mui-selected": { color: `${themeDarkMode.textPrimary} !important` },
-              "& .MuiTabs-indicator": { backgroundColor: themeDarkMode.textPrimary },
-            }}>
-            <Tab label="Movie" {...a11yProps(0)} />
-            <Tab label="TV Series" {...a11yProps(1)} />
-          </Tabs>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs
+              value={typeFilms}
+              onChange={handleChangeFilmTab}
+              aria-label="tab type movies"
+              sx={{
+                "& .MuiTab-root": { color: themeDarkMode.title },
+                "& .Mui-selected": { color: `${themeDarkMode.textPrimary} !important` },
+                "& .MuiTabs-indicator": { backgroundColor: themeDarkMode.textPrimary },
+              }}>
+              <Tab label="Movie" {...a11yProps(0)} />
+              <Tab label="TV Series" {...a11yProps(1)} />
+            </Tabs>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Typography variant="h5" component="h1" my={3} align="left" sx={{ width: "100%", fontWeight: "bold" }}>
+              {currentUser ? currentUser.displayName : "Anonymous"}
+            </Typography>
+            <Avatar alt="" src={GirlBackground} sx={{ width: 50, height: 50 }} />
+          </Box>
         </Box>
         <CustomTabPanel value={typeFilms} index={0} isLoading={isLoadingMovie}>
           <ListMovies
