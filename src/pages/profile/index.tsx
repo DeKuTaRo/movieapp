@@ -6,7 +6,8 @@ import { themeDarkMode } from "../../themes/ThemeProvider";
 import { TextFieldCustom } from "../../components/TextField";
 import GirlBackground from "../../assets/images/girl.png";
 import { useAppSelector } from "../../hooks";
-import { auth } from "../../firebase";
+import { auth, db } from "../../firebase";
+import { doc, setDoc } from "firebase/firestore";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { CredentialsProps } from "../../assets/data";
@@ -71,7 +72,10 @@ const Profile = () => {
     oldPassword: "",
   });
   const [emailError, setEmailError] = useState("");
+  const [firstNameError, setFirstNameError] = useState("");
+  const [lastNameError, setLastNameError] = useState("");
   const [newPasswordError, setNewPasswordError] = useState("");
+
   const handleUpdateUserDetail = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setDefaultUpdateUser((prevState) => ({
@@ -107,16 +111,15 @@ const Profile = () => {
     }
   };
 
-  const handleToggleEmail = () => {
-    setIsUpdateEmail((prev) => !prev);
-  };
-  const handleToggleName = () => {
-    setIsUpdateName((prev) => !prev);
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
+  const handleCancelUpdateEmail = (event: React.KeyboardEvent) => {
     if (event.key === "Escape") {
       setIsUpdateEmail(false);
+    }
+  };
+
+  const handleCancelUpdateName = (event: React.KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setIsUpdateName(false);
     }
   };
 
@@ -148,6 +151,32 @@ const Profile = () => {
     } else {
       setOpenModalAuthenticate(true);
       setNewPasswordError("");
+    }
+  };
+
+  const handleUpdateName = () => {
+    if (defaultUpdateUser.firstName.length === 0) {
+      setFirstNameError("This field is required");
+    }
+    if (defaultUpdateUser.lastName.length === 0) {
+      setLastNameError("This field is required");
+    }
+    if (checkAuthUser) {
+      try {
+        setDoc(doc(db, "users", checkAuthUser.uid), {
+          firstName: defaultUpdateUser.firstName,
+          lastName: defaultUpdateUser.lastName,
+        });
+        setDefaultUpdateUser((prevState) => ({
+          ...prevState,
+          firstName: "",
+          lastName: "",
+        }));
+        setIsUpdateName(false);
+        console.log("update successfully ");
+      } catch (err) {
+        console.log("err update name = ", err);
+      }
     }
   };
 
@@ -216,7 +245,7 @@ const Profile = () => {
                       <SendIcon />
                     </IconButton>
                   ) : (
-                    <IconButton aria-label="edit-email" onClick={handleToggleEmail}>
+                    <IconButton aria-label="edit-email" onClick={() => setIsUpdateEmail(true)}>
                       <EditIcon />
                     </IconButton>
                   )}
@@ -224,6 +253,9 @@ const Profile = () => {
 
                 {isUpdateEmail && (
                   <Grid item xs={8}>
+                    <Typography variant="subtitle1" component="h1" my={0.5} color={themeDarkMode.textColor}>
+                      Press "Esc" to cancel
+                    </Typography>
                     <TextFieldCustom
                       id="email"
                       name="email"
@@ -237,7 +269,7 @@ const Profile = () => {
                       helperTextColor={themeDarkMode.textColorHelperForm}
                       iconEnd={<EmailIcon />}
                       marginRightIcon={1}
-                      onKeyDown={handleKeyDown}
+                      onKeyDown={handleCancelUpdateEmail}
                     />
                   </Grid>
                 )}
@@ -253,42 +285,53 @@ const Profile = () => {
                   </Typography>
                 </Grid>
                 <Grid item xs={2}>
-                  <IconButton aria-label="edit-name" onClick={handleToggleName}>
-                    <EditIcon />
-                  </IconButton>
+                  {isUpdateName ? (
+                    <IconButton aria-label="edit-email" onClick={handleUpdateName}>
+                      <SendIcon />
+                    </IconButton>
+                  ) : (
+                    <IconButton aria-label="edit-email" onClick={() => setIsUpdateName(true)}>
+                      <EditIcon />
+                    </IconButton>
+                  )}
                 </Grid>
-                {/* {isUpdateName && (
+                {isUpdateName && (
                   <Grid item xs={10}>
+                    <Typography variant="subtitle1" component="h1" my={0.5} color={themeDarkMode.textColor}>
+                      Press "Esc" to cancel
+                    </Typography>
                     <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
                       <TextFieldCustom
                         id="firstName"
                         name="firstName"
-                        placeholder="Your name here"
-                        value={formik.values.firstName}
+                        placeholder="Your first name here"
+                        value={defaultUpdateUser.firstName}
                         padding={0}
-                        onChange={formik.handleChange}
-                        error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-                        helperText={formik.touched.firstName && formik.errors.firstName}
+                        onChange={handleUpdateUserDetail}
+                        error={Boolean(firstNameError)}
+                        helperText={firstNameError}
                         helperTextColor={themeDarkMode.textColorHelperForm}
                         iconEnd={<FirstNameIcon />}
                         marginRightIcon={1}
+                        onKeyDown={handleCancelUpdateName}
                       />
                       <TextFieldCustom
                         id="lastName"
                         name="lastName"
-                        placeholder="Your name here"
-                        value={formik.values.lastName}
+                        placeholder="Your last name here"
+                        value={defaultUpdateUser.lastName}
                         padding={0}
-                        onChange={formik.handleChange}
-                        error={formik.touched.lastName && Boolean(formik.errors.lastName)}
-                        helperText={formik.touched.lastName && formik.errors.lastName}
+                        onChange={handleUpdateUserDetail}
+                        error={Boolean(lastNameError)}
+                        helperText={lastNameError}
                         helperTextColor={themeDarkMode.textColorHelperForm}
                         iconEnd={<LastNameIcon />}
                         marginRightIcon={1}
+                        onKeyDown={handleCancelUpdateName}
                       />
                     </Box>
                   </Grid>
-                )} */}
+                )}
               </Grid>
               <Typography
                 variant="h5"
