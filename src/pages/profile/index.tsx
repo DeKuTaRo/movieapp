@@ -58,7 +58,6 @@ const Profile = () => {
   const [isUpdateName, setIsUpdateName] = useState<boolean>(false);
 
   const checkAuthUser = auth.currentUser;
-  console.log("checkAuthUser = ", checkAuthUser);
   const currentUser = useAppSelector((state) => state.auth.user);
 
   const [openModalAuthenticate, setOpenModalAuthenticate] = React.useState(false);

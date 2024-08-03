@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import { Box, Hidden, Typography, Link } from "@mui/material";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import { HomeIcon, ExploreIcon, SearchIcon, BookmarkedIcon, HistoryIcon, ProfileIcon, LoginIcon } from "../icons";
+import { useAppSelector } from "../../hooks";
 
 const navLinks = [
   {
@@ -69,6 +70,14 @@ interface SidebarProps {
 
 const Sidebar = ({ page }: SidebarProps) => {
   const { pathname } = useLocation();
+  const currentUser = useAppSelector((state) => state.auth.user);
+
+  const showToastRequireLogin = (event: React.MouseEvent<HTMLAnchorElement>, link: string) => {
+    if (!currentUser && ["/bookmarked", "/history", "/profile"].includes(link)) {
+      event.preventDefault();
+      alert("You must log in to use this feature.");
+    }
+  };
 
   return (
     <Box
@@ -125,6 +134,7 @@ const Sidebar = ({ page }: SidebarProps) => {
                 <Link
                   key={linkSidebar.link}
                   href={linkSidebar.link}
+                  onClick={(event) => showToastRequireLogin(event, linkSidebar.link)}
                   sx={{
                     textDecoration: "none",
                     "&:hover": {
