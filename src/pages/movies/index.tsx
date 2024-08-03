@@ -16,8 +16,9 @@ import {
   CardMedia,
   Tabs,
   Tab,
+  IconButton,
 } from "@mui/material";
-import { SearchIcon } from "../../components/icons";
+import { HeartIcon, SearchIcon, ShareIcon, ThreeDotIcon } from "../../components/icons";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
 import { useLocation, useParams } from "react-router-dom";
@@ -381,6 +382,58 @@ const MovieDetails = () => {
                   backgroundImage: "linear-gradient(to bottom left , rgba(0,0,0,0.2) , rgba(0,0,0,0.7))",
                 }}
               />
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "6%",
+                  right: "2%",
+                  display: "flex",
+                  gap: 2,
+                }}>
+                <IconButton
+                  aria-label="heartIcon"
+                  sx={{
+                    border: `3px solid ${themeDarkMode.title}`,
+                    p: 1.75,
+                    transition: "all 0.3s",
+                    color: themeDarkMode.title,
+                    "&:hover": {
+                      borderColor: themeDarkMode.textPrimary,
+                      color: themeDarkMode.textPrimary,
+                    },
+                  }}>
+                  <HeartIcon />
+                </IconButton>
+                <IconButton
+                  aria-label="shareIcon"
+                  sx={{
+                    border: `3px solid ${themeDarkMode.title}`,
+                    p: 1.75,
+                    transition: "all 0.3s",
+                    color: themeDarkMode.title,
+                    "&:hover": {
+                      borderColor: themeDarkMode.textPrimary,
+                      color: themeDarkMode.textPrimary,
+                    },
+                  }}>
+                  <ShareIcon />
+                </IconButton>
+                <IconButton
+                  aria-label="threedotIcon"
+                  sx={{
+                    border: `3px solid ${themeDarkMode.title}`,
+                    p: 1.75,
+                    transition: "all 0.3s",
+                    color: themeDarkMode.title,
+                    "&:hover": {
+                      borderColor: themeDarkMode.textPrimary,
+                      color: themeDarkMode.textPrimary,
+                    },
+                  }}>
+                  <ThreeDotIcon />
+                </IconButton>
+              </Box>
+
               <Box
                 sx={{
                   position: "absolute",
