@@ -5,11 +5,14 @@ import IconButton from "@mui/material/IconButton";
 
 interface TextFieldProps {
   margin?: "dense" | "none" | "normal";
+  padding?: number;
+  width?: string;
   name?: string;
   label?: string;
   id?: string;
   placeholder?: string;
   type?: string;
+  defaultValue?: string | null;
   value?: string | number | null;
   required?: boolean;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -18,15 +21,20 @@ interface TextFieldProps {
   helperTextColor?: string;
   iconStart?: React.ReactNode;
   iconEnd?: React.ReactNode;
+  marginRightIcon?: number;
+  onKeyDown?: (event: React.KeyboardEvent) => void;
 }
 
 export const TextFieldCustom = ({
   margin,
+  padding = 1.5,
+  width,
   name,
   label,
   id,
   placeholder,
   type,
+  defaultValue,
   value,
   required,
   onChange,
@@ -35,6 +43,8 @@ export const TextFieldCustom = ({
   helperTextColor,
   iconStart,
   iconEnd,
+  marginRightIcon,
+  onKeyDown,
 }: TextFieldProps) => {
   return (
     <TextField
@@ -49,8 +59,10 @@ export const TextFieldCustom = ({
       placeholder={placeholder}
       autoFocus
       type={type}
+      defaultValue={defaultValue}
       value={value}
       onChange={onChange}
+      onKeyDown={onKeyDown}
       FormHelperTextProps={{
         sx: { color: helperTextColor },
       }}
@@ -61,7 +73,8 @@ export const TextFieldCustom = ({
         "& .MuiOutlinedInput-root": {
           backgroundColor: themeDarkMode.backgroundSidebar,
           borderRadius: 10,
-          padding: 1.5,
+          padding: padding,
+          width: width,
           "& fieldset": {
             borderColor: "transparent",
           },
@@ -88,7 +101,7 @@ export const TextFieldCustom = ({
         ),
         endAdornment: (
           <InputAdornment position="end">
-            <IconButton>{iconEnd}</IconButton>
+            <IconButton sx={{ mr: marginRightIcon }}>{iconEnd}</IconButton>
           </InputAdornment>
         ),
       }}

@@ -16,7 +16,7 @@ interface SignInProps {
 
 const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email address").required("Required"),
-  password: Yup.string().min(8, "Must be at least 8 characters").required("Required"),
+  password: Yup.string().required("Required"),
 });
 
 const SignInForm = ({ setIsSignUp }: SignInProps) => {
