@@ -242,7 +242,7 @@ const Home = () => {
             xs: "row",
             lg: "column",
           },
-          gap: 3,
+          gap: 2,
           alignItems: "center",
           width: {
             sm: "100%",

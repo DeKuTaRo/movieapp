@@ -61,8 +61,8 @@ const SidebarRight = ({
         sx={{
           display: "flex",
           flexWrap: "wrap",
-          gap: 2,
-          height: "200px",
+          gap: 1.5,
+          height: "120px",
           overflowY: "scroll",
         }}
         px={2}>
@@ -74,7 +74,7 @@ const SidebarRight = ({
               component="h1"
               sx={{
                 backgroundColor: themeDarkMode.backgroundColor,
-                padding: "0.5rem",
+                padding: "0.75rem 1rem",
                 borderRadius: "1rem",
               }}>
               {item.name}
@@ -94,7 +94,7 @@ const SidebarRight = ({
         ))
       ) : (
         <List>
-          {movieTrending.slice(0, 2).map((movie) => (
+          {movieTrending.slice(0, 3).map((movie) => (
             <ListItem key={movie.id}>
               <Link href={`${typeFilms === 0 ? "/movie/" : "/tv/"}${movie.id}`} underline="none">
                 <Card
