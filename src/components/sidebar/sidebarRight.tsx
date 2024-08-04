@@ -93,7 +93,7 @@ const SidebarRight = ({
           <CustomSkeleton keyItem={index} variant="rectangular" width={265} height={127} />
         ))
       ) : (
-        <List>
+        <List sx={{ width: "95%", overflow: "hidden" }}>
           {movieTrending.slice(0, 3).map((movie) => (
             <ListItem key={movie.id}>
               <Link href={`${typeFilms === 0 ? "/movie/" : "/tv/"}${movie.id}`} underline="none">

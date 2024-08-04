@@ -16,9 +16,8 @@ import {
   CardMedia,
   Tabs,
   Tab,
-  IconButton,
 } from "@mui/material";
-import { HeartIcon, SearchIcon, ShareIcon, ThreeDotIcon } from "../../components/icons";
+import { SearchIcon } from "../../components/icons";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
 import { useLocation, useParams } from "react-router-dom";
@@ -33,6 +32,7 @@ import { themeDarkMode } from "../../themes/ThemeProvider";
 import CustomSkeleton from "../../components/Skeleton";
 import SidebarShorten from "../../components/sidebar/sidebarShorten";
 import { headers } from "../../utils";
+import FeatureIcons from "./components/FeatureIcons";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -236,7 +236,7 @@ const MediaEmbed: React.FC<MediaProps> = ({ id, keyVideo, type, name }) => {
         height="100%"
         id={`widget-${id}`}
       />
-      <Typography variant="h6" noWrap>
+      <Typography variant="subtitle1" gutterBottom noWrap px={1.5}>
         {name}
       </Typography>
     </>
@@ -382,57 +382,14 @@ const MovieDetails = () => {
                   backgroundImage: "linear-gradient(to bottom left , rgba(0,0,0,0.2) , rgba(0,0,0,0.7))",
                 }}
               />
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "6%",
-                  right: "2%",
-                  display: "flex",
-                  gap: 2,
-                }}>
-                <IconButton
-                  aria-label="heartIcon"
-                  sx={{
-                    border: `3px solid ${themeDarkMode.title}`,
-                    p: 1.75,
-                    transition: "all 0.3s",
-                    color: themeDarkMode.title,
-                    "&:hover": {
-                      borderColor: themeDarkMode.textPrimary,
-                      color: themeDarkMode.textPrimary,
-                    },
-                  }}>
-                  <HeartIcon />
-                </IconButton>
-                <IconButton
-                  aria-label="shareIcon"
-                  sx={{
-                    border: `3px solid ${themeDarkMode.title}`,
-                    p: 1.75,
-                    transition: "all 0.3s",
-                    color: themeDarkMode.title,
-                    "&:hover": {
-                      borderColor: themeDarkMode.textPrimary,
-                      color: themeDarkMode.textPrimary,
-                    },
-                  }}>
-                  <ShareIcon />
-                </IconButton>
-                <IconButton
-                  aria-label="threedotIcon"
-                  sx={{
-                    border: `3px solid ${themeDarkMode.title}`,
-                    p: 1.75,
-                    transition: "all 0.3s",
-                    color: themeDarkMode.title,
-                    "&:hover": {
-                      borderColor: themeDarkMode.textPrimary,
-                      color: themeDarkMode.textPrimary,
-                    },
-                  }}>
-                  <ThreeDotIcon />
-                </IconButton>
-              </Box>
+              <FeatureIcons
+                detailsMovie={detailsMovie}
+                id={detailsMovie.id}
+                title={detailsMovie.title || detailsMovie.name}
+                poster_path={detailsMovie.poster_path}
+                vote_average={detailsMovie.vote_average}
+                isMoviePath={isMoviePath}
+              />
 
               <Box
                 sx={{
@@ -744,7 +701,7 @@ const MovieDetails = () => {
                   )}
                 </Box>
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={3} sx={{ mt: 4 }}>
                 {isLoading ? (
                   <>
                     <CustomSkeleton variant="text" fontSize="1rem" />
@@ -753,7 +710,15 @@ const MovieDetails = () => {
                   </>
                 ) : (
                   <>
-                    <h1>Media</h1>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        fontWeight: "bold",
+                        width: "fit-content",
+                      }}
+                      gutterBottom>
+                      Media
+                    </Typography>
                     <Box sx={{ paddingRight: "0.75rem", height: "400px", overflowY: "scroll" }}>
                       {!isLoading && detailMediasMovie && detailMediasMovie.results.length > 0 ? (
                         detailMediasMovie.results.map((media) => (
@@ -762,7 +727,7 @@ const MovieDetails = () => {
                           </Box>
                         ))
                       ) : (
-                        <Typography align="center" sx={{ width: "100%" }}>
+                        <Typography variant="subtitle1" align="center" sx={{ width: "100%" }}>
                           There is no media available.
                         </Typography>
                       )}
@@ -787,7 +752,7 @@ const MovieDetails = () => {
             alignItems: "center",
             width: {
               sm: "100%",
-              lg: 420,
+              lg: 300,
             },
           }}>
           <Paper

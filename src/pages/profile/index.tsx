@@ -7,10 +7,7 @@ import { TextFieldCustom } from "../../components/TextField";
 import GirlBackground from "../../assets/images/girl.png";
 import { useAppSelector } from "../../hooks";
 import { auth, db } from "../../firebase";
-import { doc, setDoc } from "firebase/firestore";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { CredentialsProps } from "../../assets/data";
+import { doc, updateDoc } from "firebase/firestore";
 import { EmailIcon, FirstNameIcon, LastNameIcon, EditIcon, SendIcon, PasswordIcon } from "../../components/icons";
 import {
   updateEmail,
@@ -21,19 +18,6 @@ import {
   updatePassword,
 } from "firebase/auth";
 
-const style = {
-  position: "absolute" as "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: themeDarkMode.backgroundColor,
-  color: themeDarkMode.title,
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-  textAlign: "center",
-};
 const validateEmail = (email: string) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(email);
@@ -53,7 +37,6 @@ export interface CredentialsUpdateProps {
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [isUpdateEmail, setIsUpdateEmail] = useState<boolean>(false);
   const [isUpdateName, setIsUpdateName] = useState<boolean>(false);
 
@@ -134,10 +117,9 @@ const Profile = () => {
   };
 
   const handleSignOut = async () => {
-    signOut(auth)
+    await signOut(auth)
       .then(() => {
         navigate("/");
-        // Sign-out successful.
       })
       .catch((error: any) => {
         console.log("err = ", error);
@@ -153,7 +135,7 @@ const Profile = () => {
     }
   };
 
-  const handleUpdateName = () => {
+  const handleUpdateName = async () => {
     if (defaultUpdateUser.firstName.length === 0) {
       setFirstNameError("This field is required");
     }
@@ -162,7 +144,7 @@ const Profile = () => {
     }
     if (checkAuthUser) {
       try {
-        setDoc(doc(db, "users", checkAuthUser.uid), {
+        await updateDoc(doc(db, "users", checkAuthUser.uid), {
           firstName: defaultUpdateUser.firstName,
           lastName: defaultUpdateUser.lastName,
         });
@@ -407,7 +389,19 @@ const Profile = () => {
         onClose={handleClose}
         aria-labelledby="modal-reAuthenticated"
         aria-describedby="modal-typeOldPassword">
-        <Box sx={style}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: themeDarkMode.backgroundColor,
+            color: themeDarkMode.title,
+            boxShadow: 24,
+            p: 4,
+            textAlign: "center",
+          }}>
           <Typography id="modal-modal-title" variant="h6" component="h2" gutterBottom>
             Enter your old password here
           </Typography>

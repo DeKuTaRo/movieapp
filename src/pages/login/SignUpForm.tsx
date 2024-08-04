@@ -1,4 +1,4 @@
-import React, { useState, Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { Button, Grid, Box } from "@mui/material";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import { EmailIcon, PasswordIcon, FirstNameIcon, LastNameIcon } from "../../components/icons";
@@ -13,7 +13,6 @@ import { CredentialsProps } from "../../assets/data";
 interface SignUpProps {
   setIsSignUp: Dispatch<SetStateAction<boolean>>;
 }
-
 
 const validationSchema = Yup.object({
   firstName: Yup.string().max(15, "Must be 15 characters or less").required("Required"),
@@ -32,7 +31,6 @@ export default function SignUpForm({ setIsSignUp }: SignUpProps) {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      console.log("values = ", values);
       handleSignUp(values);
     },
   });
@@ -43,7 +41,7 @@ export default function SignUpForm({ setIsSignUp }: SignUpProps) {
       setDoc(doc(db, "users", user.user.uid), {
         firstName: values.firstName,
         lastName: values.lastName,
-        bookmarks: [],
+        bookmarks: {},
         recentlyWatch: [],
       });
       setIsSignUp(false);

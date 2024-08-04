@@ -67,7 +67,6 @@ function a11yProps(index: number) {
 
 const Home = () => {
   const currentUser = useAppSelector((state) => state.auth.user);
-  console.log("currentUser", currentUser);
   const [isLoadingMovie, setIsLoadingMovie] = useState<boolean>(true);
   const [isLoadingTV, setIsLoadingTV] = useState<boolean>(true);
   const [isFetchedMoviesData, setIsFetchedMoviesData] = useState<boolean>(false);
@@ -246,7 +245,7 @@ const Home = () => {
           alignItems: "center",
           width: {
             sm: "100%",
-            lg: 450,
+            lg: 280,
           },
         }}>
         {typeFilms === 0 ? (

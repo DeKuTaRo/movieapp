@@ -129,3 +129,10 @@ export interface CredentialsProps {
   email: string;
   password: string;
 }
+
+export interface BookmarkProps {
+  type: 'movie' | 'tv';
+  id: string;
+  title: string;
+  url: string;
+}
