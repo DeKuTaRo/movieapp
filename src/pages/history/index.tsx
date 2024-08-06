@@ -3,7 +3,7 @@ import { Box, BoxProps, Tabs, Tab, Grid, Typography, Link, Paper, Card, CardCont
 
 import Sidebar from "../../components/sidebar";
 import { themeDarkMode } from "../../themes/ThemeProvider";
-import { Star } from "@mui/icons-material";
+import { StarIcon } from "../../components/icons";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -93,7 +93,7 @@ const MovieItem: React.FC<{ movie: MovieProps; typeFilm: number }> = ({ movie, t
                 }}>
                 {movie.vote_average && movie.vote_average.toFixed(1)}
               </Typography>
-              <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
+              <StarIcon width="12" height="12" />
             </Typography>
           </CardContent>
         </Card>

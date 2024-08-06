@@ -33,6 +33,9 @@ export interface MovieDataType {
       vote_average: number;
     }
   ];
+  videos?: {
+    results: DetailMediaMovie[];
+  };
   popularity?: number;
 
   // person detail
@@ -88,12 +91,9 @@ export interface DetailReviewMovie {
 
 export interface DetailMediaMovie {
   id: string;
-  results: {
-    id: string;
-    name: string;
-    key: string;
-    type: string;
-  }[];
+  name: string;
+  key: string;
+  type: string;
 }
 
 export interface ExtenalIDs {
@@ -131,7 +131,7 @@ export interface CredentialsProps {
 }
 
 export interface BookmarkProps {
-  type: 'movie' | 'tv';
+  type: "movie" | "tv";
   id: string;
   title: string;
   url: string;

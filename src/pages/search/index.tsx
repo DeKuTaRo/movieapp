@@ -16,19 +16,22 @@ import {
   Pagination,
   PaginationItem,
 } from "@mui/material";
-import { Star } from "@mui/icons-material";
-
 import axios from "axios";
 import { MovieDataType } from "../../assets/data";
-
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { themeDarkMode } from "../../themes/ThemeProvider";
-import GirlBackground from "../../assets/images/girl.png";
-import EmptyBackdrop from "../../assets/images/emptyBackdrop.jpg";
+import { GirlBackground, EmptyBackdrop } from "../../assets";
 import Sidebar from "../../components/sidebar";
 import { headers } from "../../utils";
-import { KeyboardArrowLeft, KeyboardArrowRight, FirstPage, LastPage } from "@mui/icons-material";
-import { SearchIcon, ClearIcon } from "../../components/icons";
+import {
+  SearchIcon,
+  ClearIcon,
+  StarIcon,
+  ArrowDownIcon,
+  ArrowPrevIcon,
+  ArrowNextIcon,
+  FirstPageIcon,
+  LastPageIcon,
+} from "../../components/icons";
 
 const MovieItem: React.FC<{ movie: MovieDataType }> = ({ movie }) => {
   const getImageUrl = (movie: MovieDataType) => {
@@ -94,7 +97,7 @@ const MovieItem: React.FC<{ movie: MovieDataType }> = ({ movie }) => {
                   }}>
                   {movie.vote_average && parseFloat(movie.vote_average).toFixed(1)}
                 </Typography>
-                <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
+                <StarIcon width="12" height="12" />
               </Typography>
             </CardContent>
           </Card>
@@ -190,7 +193,7 @@ const Search = () => {
       <Sidebar />
 
       <Box sx={{ width: "100%", overflowX: "hidden", overflowY: "scroll" }}>
-        <Grid container spacing={1} sx={{}}>
+        <Grid container spacing={1}>
           <Grid item xs={9}>
             <Box
               sx={{
@@ -211,7 +214,7 @@ const Search = () => {
                 onKeyDown={handleKeyDown}
                 sx={{
                   m: 2,
-                  color: "white",
+                  color: themeDarkMode.title,
                   border: `1px solid ${themeDarkMode.title}`,
                   borderRadius: "1rem",
                   p: 2,
@@ -263,10 +266,10 @@ const Search = () => {
                       <PaginationItem
                         {...item}
                         slots={{
-                          previous: KeyboardArrowLeft,
-                          next: KeyboardArrowRight,
-                          first: FirstPage,
-                          last: LastPage,
+                          previous: ArrowPrevIcon,
+                          next: ArrowNextIcon,
+                          first: FirstPageIcon,
+                          last: LastPageIcon,
                         }}
                         sx={{
                           marginBottom: 4,
@@ -311,7 +314,7 @@ const Search = () => {
                     Search Results
                   </Typography>
                   <Button
-                    startIcon={<KeyboardArrowDownIcon width={20} height={20} />}
+                    startIcon={<ArrowDownIcon />}
                     sx={{ color: themeDarkMode.title }}
                     onClick={() => setSortCollapse((prev) => !prev)}
                   />
@@ -333,7 +336,7 @@ const Search = () => {
                       sx={{
                         width: "100%",
                         justifyContent: "center",
-                        backgroundColor: typeSearch === "multi" ? "gray" : "transparent",
+                        backgroundColor: typeSearch === "multi" ? themeDarkMode.textColor : "transparent",
                         borderRadius: "0.5rem",
                       }}
                       onClick={() => handleChangeTypeSearch("multi")}>
@@ -343,7 +346,7 @@ const Search = () => {
                       sx={{
                         width: "100%",
                         justifyContent: "center",
-                        backgroundColor: typeSearch === "movie" ? "gray" : "transparent",
+                        backgroundColor: typeSearch === "movie" ? themeDarkMode.textColor : "transparent",
                         borderRadius: "0.5rem",
                       }}
                       onClick={() => handleChangeTypeSearch("movie")}>
@@ -353,7 +356,7 @@ const Search = () => {
                       sx={{
                         width: "100%",
                         justifyContent: "center",
-                        backgroundColor: typeSearch === "tv" ? "gray" : "transparent",
+                        backgroundColor: typeSearch === "tv" ? themeDarkMode.textColor : "transparent",
                         borderRadius: "0.5rem",
                       }}
                       onClick={() => handleChangeTypeSearch("tv")}>
@@ -363,7 +366,7 @@ const Search = () => {
                       sx={{
                         width: "100%",
                         justifyContent: "center",
-                        backgroundColor: typeSearch === "person" ? "gray" : "transparent",
+                        backgroundColor: typeSearch === "person" ? themeDarkMode.textColor : "transparent",
                         borderRadius: "0.5rem",
                       }}
                       onClick={() => handleChangeTypeSearch("person")}>

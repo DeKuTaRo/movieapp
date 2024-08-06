@@ -1,8 +1,9 @@
 import { useLocation } from "react-router-dom";
-import { Box, Hidden, Typography, Link } from "@mui/material";
+import { Box, Hidden, Typography, Link, Avatar } from "@mui/material";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import { HomeIcon, ExploreIcon, SearchIcon, BookmarkedIcon, HistoryIcon, ProfileIcon, LoginIcon } from "../icons";
 import { useAppSelector } from "../../hooks";
+import { Logo } from "../../assets";
 
 const navLinks = [
   {
@@ -76,6 +77,9 @@ const Sidebar = ({ page }: SidebarProps) => {
     if (!currentUser && ["/bookmarked", "/history", "/profile"].includes(link)) {
       event.preventDefault();
       alert("You must log in to use this feature.");
+    } else if (currentUser && link === "/history") {
+      event.preventDefault();
+      alert("This feature is updating");
     }
   };
 
@@ -96,7 +100,7 @@ const Sidebar = ({ page }: SidebarProps) => {
             xs: "row",
             lg: "column",
           },
-          gap: 4,
+          gap: 3,
           alignItems: {
             xs: "center",
             lg: "start",
@@ -104,11 +108,14 @@ const Sidebar = ({ page }: SidebarProps) => {
           justifyContent: "center",
           marginLeft: "1rem",
         }}>
-        <Hidden smDown>
-          <Typography variant="h5" component="h1" mt={2}>
-            Choubeobeos
-          </Typography>
-        </Hidden>
+        <Box sx={{ display: "flex", alignItems: "center", mt: 2, gap: 1 }}>
+          <Hidden smDown>
+            <Typography variant="h5" component="h1">
+              Indigo Reel
+            </Typography>
+          </Hidden>
+          <Avatar alt="Logo" src={Logo} sx={{ width: 40, height: 40 }} />
+        </Box>
 
         {navLinks.map((item) => (
           <Box
@@ -116,7 +123,7 @@ const Sidebar = ({ page }: SidebarProps) => {
             sx={{
               py: {
                 xs: "0px",
-                lg: "16px",
+                lg: "0.5rem",
               },
               display: "flex",
               flexDirection: {

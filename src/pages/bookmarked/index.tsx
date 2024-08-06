@@ -1,25 +1,12 @@
 import React, { useEffect, useState, useMemo } from "react";
-import {
-  Box,
-  Tabs,
-  Tab,
-  Grid,
-  Typography,
-  Link,
-  Paper,
-  Card,
-  CardContent,
-  Button,
-  Checkbox,
-} from "@mui/material";
+import { Box, Tabs, Tab, Grid, Typography, Link, Paper, Card, CardContent, Button, Checkbox } from "@mui/material";
 import Sidebar from "../../components/sidebar";
 import { themeDarkMode } from "../../themes/ThemeProvider";
-import { Star } from "@mui/icons-material";
 import { db } from "../../firebase";
 import { doc, getDoc, updateDoc, arrayRemove } from "firebase/firestore";
 import { useAppSelector } from "../../hooks";
 import CustomSkeleton from "../../components/Skeleton";
-import { EditIcon, SelectAllIcon, ClearIcon, CancelIcon, BookmarkedIcon } from "../../components/icons";
+import { EditIcon, SelectAllIcon, ClearIcon, CancelIcon, BookmarkedIcon, StarIcon } from "../../components/icons";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -124,7 +111,7 @@ const MovieItem: React.FC<{ movie: Bookmark; isChecked: boolean; onCheckboxChang
                   }}>
                   {parseFloat(movie.vote_average).toFixed(1)}
                 </Typography>
-                <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
+                <StarIcon width="12" height="12" />
               </Typography>
             </CardContent>
           </Card>
@@ -184,7 +171,7 @@ const Bookmarked = () => {
         if (currentUser) {
           const userDocRef = doc(db, "users", currentUser.uid);
           const userDoc = await getDoc(userDocRef);
-  
+
           if (userDoc.exists()) {
             const userData = userDoc.data();
             setBookmarks(userData.bookmarks || []);

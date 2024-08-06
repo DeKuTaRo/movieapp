@@ -9,10 +9,10 @@ import "swiper/css/autoplay";
 import "swiper/css/mousewheel";
 import { MovieDataType, GenresData } from "../../assets/data";
 import IconButton from "@mui/material/IconButton";
-import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import PosterCardContent from "./components/PosterCardContent";
 import BackdropCardContent from "./components/BackdropCardContent";
+import { ArrowPrevIcon, ArrowNextIcon } from "../../components/icons";
 
 const ButtonNavBackdrop: React.FC = () => {
   const swiper = useSwiper();
@@ -23,14 +23,14 @@ const ButtonNavBackdrop: React.FC = () => {
         onClick={() => swiper.slidePrev()}
         aria-label="previous slide"
         sx={{ position: "absolute", top: "40%", left: "2%", backgroundColor: themeDarkMode.textColor, zIndex: 10 }}>
-        <KeyboardArrowLeft sx={{ color: themeDarkMode.title }} />
+        <ArrowPrevIcon />
       </IconButton>
       <IconButton
         onClick={() => swiper.slideNext()}
         color="secondary"
         aria-label="next slide"
         sx={{ position: "absolute", top: "40%", right: "27%", backgroundColor: themeDarkMode.textColor, zIndex: 10 }}>
-        <KeyboardArrowRight sx={{ color: themeDarkMode.title }} />
+        <ArrowNextIcon />
       </IconButton>
     </>
   );
@@ -83,15 +83,15 @@ const ListMovies = ({
         spaceBetween={type === "poster" ? 50 : 20}
         slidesPerView={type === "poster" ? 1 : 6}
         loop={type === "poster" ? true : true}
-        autoplay={
-          type === "poster"
-            ? {
-                delay: 3000,
-                disableOnInteraction: false,
-                pauseOnMouseEnter: true,
-              }
-            : undefined
-        }
+        // autoplay={
+        //   type === "poster"
+        //     ? {
+        //         delay: 3000,
+        //         disableOnInteraction: false,
+        //         pauseOnMouseEnter: true,
+        //       }
+        //     : undefined
+        // }
         onSlideChange={(swiper: SwiperClass) => handleSlideChange(swiper)}
         onSwiper={(swiper: SwiperClass) => {
           swiperRef.current = swiper;

@@ -14,7 +14,7 @@ import { themeDarkMode } from "../../themes/ThemeProvider";
 import CustomSkeleton from "../../components/Skeleton";
 import { headers } from "../../utils";
 import { useAppSelector } from "../../hooks";
-import GirlBackground from "../../assets/images/girl.png";
+import { GirlBackground } from "../../assets";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -242,7 +242,6 @@ const Home = () => {
             lg: "column",
           },
           gap: 2,
-          alignItems: "center",
           width: {
             sm: "100%",
             lg: 280,

@@ -1,13 +1,13 @@
 import React from "react";
 import { Typography, CardContent } from "@mui/material";
-import EmptyBackdrop from "../../../assets/images/emptyBackdrop.jpg";
+import { EmptyBackdrop } from "../../../assets";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/autoplay";
 import "swiper/css/mousewheel";
 import { MovieDataType } from "../../../assets/data";
-import { Star } from "@mui/icons-material";
 import { themeDarkMode } from "../../../themes/ThemeProvider";
+import { StarIcon } from "../../../components/icons/index";
 
 const BackdropCardContent = ({ movie }: { movie: MovieDataType }) => {
   return (
@@ -47,7 +47,7 @@ const BackdropCardContent = ({ movie }: { movie: MovieDataType }) => {
             }}>
             {movie.vote_average && parseFloat(movie.vote_average).toFixed(1)}
           </Typography>
-          <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
+          <StarIcon width="12" height="12" />
         </Typography>
       </CardContent>
     </>

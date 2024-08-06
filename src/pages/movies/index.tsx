@@ -18,16 +18,14 @@ import {
   Tab,
 } from "@mui/material";
 import { SearchIcon } from "../../components/icons";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-
+import { PlayArrowIcon } from "../../components/icons";
 import { useLocation, useParams } from "react-router-dom";
 
-import EmptyBackDrop from "../../assets/images/emptyBackdrop.jpg";
+import { EmptyBackdrop } from "../../assets";
 
 import axios from "axios";
-import { GenresData, MovieDataType, DetailCastMovie, DetailReviewMovie, DetailMediaMovie } from "../../assets/data";
-
-import { Star, StarBorder, StarHalf } from "@mui/icons-material";
+import { GenresData, MovieDataType, DetailCastMovie, DetailReviewMovie } from "../../assets/data";
+import { StarIcon, StarHalfIcon } from "../../components/icons/index";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import CustomSkeleton from "../../components/Skeleton";
 import SidebarShorten from "../../components/sidebar/sidebarShorten";
@@ -96,27 +94,14 @@ const Rating: React.FC<RatingProps> = ({ value, maxValue = 10, totalStars = 5 })
   return (
     <Box display="flex" alignItems="center">
       {[...Array(filledStars)].map((_, index) => (
-        <Star key={index} style={{ color: "yellow" }} />
+        <StarIcon width="16" height="16" color={themeDarkMode.starRatingColor} />
       ))}
-      {hasHalfStar && <StarHalf style={{ color: "yellow" }} />}
+      {hasHalfStar && <StarHalfIcon width="16" height="16" color={themeDarkMode.starRatingColor} />}
       {[...Array(emptyStars)].map((_, index) => (
-        <StarBorder key={index} style={{ color: "gray" }} />
+        <StarIcon width="16" height="16" borderIcon={themeDarkMode.starRatingColor} color="none" />
       ))}
     </Box>
   );
-};
-
-const formatDateString = (dateString: string): string => {
-  // Extract the date part (YYYY-MM-DD) from the full date-time string
-  const datePart = dateString.split("T")[0];
-
-  // Split the date part into its components
-  const [year, month, day] = datePart.split("-");
-
-  // Rearrange the components to the desired format (DD-MM-YYYY)
-  const formattedDate = `${day}-${month}-${year}`;
-
-  return formattedDate;
 };
 
 interface NumberCircleProps {
@@ -171,7 +156,7 @@ const NumberCircle: React.FC<NumberCircleProps> = ({ number }) => {
           width: 36,
           height: 36,
           backgroundColor: themeDarkMode.backgroundSidebar,
-          color: "white",
+          color: themeDarkMode.title,
           fontSize: 16,
           fontFamily: "Arial, sans-serif",
           zIndex: 1,
@@ -277,19 +262,26 @@ const MovieDetails = () => {
         vote_average: 0,
       },
     ],
+    videos: {
+      results: [],
+    },
   });
   const [detailCastsMovie, setDetailCastsMovie] = React.useState<DetailCastMovie[]>([]);
   const [detailReviewsMovie, setDetailReviewsMovie] = React.useState<DetailReviewMovie | null>(null);
-  const [detailMediasMovie, setDetailMediasMovie] = React.useState<DetailMediaMovie | null>(null);
   const [detailSimilarMovie, setDetailSimilarMovie] = React.useState<MovieDataType[]>([]);
   const isMoviePath = location.pathname.startsWith("/movie/");
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const [response1, response2, response3, response4, response5] = await Promise.all([
-          axios.get(`https://api.themoviedb.org/3/${isMoviePath ? "movie" : "tv"}/${params.id}?language=en-US`, {
-            headers,
-          }),
+        const [response1, response2, response3, response4] = await Promise.all([
+          axios.get(
+            `https://api.themoviedb.org/3/${isMoviePath ? "movie" : "tv"}/${
+              params.id
+            }?language=en-US&append_to_response=videos`,
+            {
+              headers,
+            }
+          ),
           axios.get(
             `https://api.themoviedb.org/3/${isMoviePath ? "movie" : "tv"}/${params.id}/credits?language=en-US`,
             {
@@ -302,20 +294,17 @@ const MovieDetails = () => {
               headers,
             }
           ),
-          axios.get(`https://api.themoviedb.org/3/${isMoviePath ? "movie" : "tv"}/${params.id}/videos?language=en-US`, {
-            headers,
-          }),
           axios.get(
             `https://api.themoviedb.org/3/${isMoviePath ? "movie" : "tv"}/${params.id}/similar?language=en-US&page=1`,
             { headers }
           ),
         ]);
 
+        console.log("res1 = ", response1);
         setDetailsMovie(response1.data);
         setDetailCastsMovie(response2.data.cast);
         setDetailReviewsMovie(response3.data);
-        setDetailMediasMovie(response4.data);
-        setDetailSimilarMovie(response5.data.results);
+        setDetailSimilarMovie(response4.data.results);
       } catch (err) {
         console.log("error: ", err);
       } finally {
@@ -346,7 +335,7 @@ const MovieDetails = () => {
             xs: "column",
             lg: "row",
           },
-          color: "white",
+          color: themeDarkMode.title,
           gap: 2,
           height: "100vh",
           overflowY: "hidden",
@@ -442,7 +431,7 @@ const MovieDetails = () => {
                   <Button
                     size="large"
                     sx={{ backgroundColor: themeDarkMode.textPrimary }}
-                    startIcon={<PlayArrowIcon />}
+                    startIcon={<PlayArrowIcon includeBackgroundColor={false} />}
                     variant="contained">
                     Watch
                   </Button>
@@ -593,7 +582,7 @@ const MovieDetails = () => {
                                   src={
                                     review.author_details.avatar_path
                                       ? `https://image.tmdb.org/t/p/original/${review.author_details.avatar_path}`
-                                      : EmptyBackDrop
+                                      : EmptyBackdrop
                                   }
                                   sx={{ width: 60, height: 60 }}
                                 />{" "}
@@ -627,7 +616,7 @@ const MovieDetails = () => {
                                 <Button variant="outlined" onClick={() => handleShowFullReview(review.id)}>
                                   {toggleReview === review.id ? "Show less" : "Show more"}
                                 </Button>
-                                <Typography align="right">{formatDateString(review.created_at)}</Typography>
+                                <Typography align="right">{(review.created_at.split("T")[0])}</Typography>
                               </Item>
                             </Grid>
                           </React.Fragment>
@@ -654,7 +643,7 @@ const MovieDetails = () => {
                                 src={
                                   season.poster_path
                                     ? `https://image.tmdb.org/t/p/w200/${season.poster_path}`
-                                    : EmptyBackDrop
+                                    : EmptyBackdrop
                                 }
                                 style={{ borderRadius: "0.5rem", width: "133px", height: "200px" }}
                                 alt={season.name}
@@ -689,7 +678,7 @@ const MovieDetails = () => {
                                       }}>
                                       {season.vote_average.toFixed(1)}
                                     </Typography>
-                                    <Star sx={{ width: "1rem", height: "1rem" }} />
+                                    <StarIcon width="12" height="12" />
                                   </Typography>
                                   {season.air_date}
                                 </Typography>
@@ -720,8 +709,8 @@ const MovieDetails = () => {
                       Media
                     </Typography>
                     <Box sx={{ paddingRight: "0.75rem", height: "400px", overflowY: "scroll" }}>
-                      {!isLoading && detailMediasMovie && detailMediasMovie.results.length > 0 ? (
-                        detailMediasMovie.results.map((media) => (
+                      {!isLoading && detailsMovie.videos && detailsMovie.videos.results.length > 0 ? (
+                        detailsMovie.videos.results.map((media) => (
                           <Box key={media.id}>
                             <MediaEmbed id={media.id} keyVideo={media.key} type={media.type} name={media.name} />
                           </Box>
@@ -797,7 +786,7 @@ const MovieDetails = () => {
                         sx={{
                           display: "flex",
                           backgroundColor: themeDarkMode.backgroundSidebar,
-                          color: "white",
+                          color: themeDarkMode.title,
                           width: "100%",
                           cursor: "pointer",
                           "&:hover": {
@@ -837,7 +826,7 @@ const MovieDetails = () => {
                               }}>
                               {movie.vote_average && parseFloat(movie.vote_average).toFixed(1)}
                             </Typography>
-                            <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
+                            <StarIcon width="12" height="12" />
                           </Typography>
                         </CardContent>
                       </Card>

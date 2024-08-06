@@ -4,7 +4,7 @@ import { Box, Grid, Typography, Button, Avatar, IconButton, Modal } from "@mui/m
 import Sidebar from "../../components/sidebar";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import { TextFieldCustom } from "../../components/TextField";
-import GirlBackground from "../../assets/images/girl.png";
+import { GirlBackground } from "../../assets";
 import { useAppSelector } from "../../hooks";
 import { auth, db } from "../../firebase";
 import { doc, updateDoc } from "firebase/firestore";
@@ -44,7 +44,6 @@ const Profile = () => {
   const currentUser = useAppSelector((state) => state.auth.user);
 
   const [openModalAuthenticate, setOpenModalAuthenticate] = React.useState(false);
-  const handleOpenAuthenticateModal = () => setOpenModalAuthenticate(true);
   const handleClose = () => setOpenModalAuthenticate(false);
   const [defaultUpdateUser, setDefaultUpdateUser] = useState<CredentialsUpdateProps>({
     email: "",

@@ -12,10 +12,9 @@ import {
   Button,
   Link,
 } from "@mui/material";
-import { SearchIcon } from "../icons";
+import { SearchIcon, StarIcon } from "../../components/icons";
 import { GenresData, MovieDataType } from "../../assets/data";
 import { themeDarkMode } from "../../themes/ThemeProvider";
-import { Star } from "@mui/icons-material";
 import CustomSkeleton from "../Skeleton";
 
 const SidebarRight = ({
@@ -39,7 +38,7 @@ const SidebarRight = ({
           p: 1,
           mt: 2,
           backgroundColor: themeDarkMode.backgroundColor,
-          width: "85%",
+          width: "90%",
           borderRadius: "0.5rem",
         }}>
         <InputBase
@@ -64,8 +63,7 @@ const SidebarRight = ({
           gap: 1.5,
           height: "120px",
           overflowY: "scroll",
-        }}
-        px={2}>
+        }}>
         {(isLoading ? Array.from(new Array(12)) : genres).map((item, index) =>
           item ? (
             <Typography
@@ -84,7 +82,7 @@ const SidebarRight = ({
           )
         )}
       </Box>
-      <Typography variant="h5" component="h1" mb={1} align="left" sx={{ width: "100%", fontWeight: "bold" }}>
+      <Typography variant="h5" component="h1" align="left" sx={{ fontWeight: "bold" }}>
         {isLoading ? <CustomSkeleton width={152} height={60} /> : "Trending"}
       </Typography>
 
@@ -95,7 +93,7 @@ const SidebarRight = ({
       ) : (
         <List sx={{ width: "95%", overflow: "hidden" }}>
           {movieTrending.slice(0, 3).map((movie) => (
-            <ListItem key={movie.id}>
+            <ListItem key={movie.id} sx={{ px: 0 }}>
               <Link href={`${typeFilms === 0 ? "/movie/" : "/tv/"}${movie.id}`} underline="none">
                 <Card
                   sx={{
@@ -108,7 +106,7 @@ const SidebarRight = ({
                   }}>
                   <CardMedia
                     component="img"
-                    sx={{ width: "26%" }}
+                    sx={{ width: 70, height: 130 }}
                     image={`https://image.tmdb.org/t/p/w342/${movie.backdrop_path}`}
                     alt={movie.title || movie.name}
                   />
@@ -140,7 +138,7 @@ const SidebarRight = ({
                         }}>
                         {movie.vote_average && parseFloat(movie.vote_average).toFixed(1)}
                       </Typography>
-                      <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
+                      <StarIcon width="12" height="12" />
                     </Typography>
                   </CardContent>
                 </Card>

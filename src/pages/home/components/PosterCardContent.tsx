@@ -7,8 +7,8 @@ import "swiper/css/autoplay";
 import "swiper/css/mousewheel";
 import { MovieDataType, GenresData } from "../../../assets/data";
 import IconButton from "@mui/material/IconButton";
-import { Star, PlayArrow, KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { themeDarkMode } from "../../../themes/ThemeProvider";
+import { StarIcon, ArrowPrevIcon, ArrowNextIcon, PlayArrowIcon } from "../../../components/icons/index";
 
 const ButtonNavPoster = ({
   swiperRef,
@@ -40,7 +40,7 @@ const ButtonNavPoster = ({
         onClick={handlePrev}
         aria-label="previous slide"
         sx={{ position: "absolute", top: "2%", left: "2%", backgroundColor: "transparent", zIndex: 10 }}>
-        <KeyboardArrowLeft sx={{ color: isFirstSlide ? themeDarkMode.textColor : themeDarkMode.title }} />
+        <ArrowPrevIcon color={isFirstSlide ? themeDarkMode.textColor : themeDarkMode.title} />
       </IconButton>
       <IconButton
         onClick={handleNext}
@@ -53,7 +53,7 @@ const ButtonNavPoster = ({
           backgroundColor: "transparent",
           zIndex: 10,
         }}>
-        <KeyboardArrowRight sx={{ color: isLastSlide ? themeDarkMode.textColor : themeDarkMode.title }} />
+        <ArrowNextIcon color={isLastSlide ? themeDarkMode.textColor : themeDarkMode.title} />
       </IconButton>
     </>
   );
@@ -165,7 +165,6 @@ const PosterCardContent = ({
             {movie.overview}
           </Typography>
         </Box>
-
         <Typography
           variant="body1"
           component="span"
@@ -182,7 +181,7 @@ const PosterCardContent = ({
           <Typography sx={{ fontWeight: "bold", fontSize: "0.75rem", marginRight: 0.5 }}>
             {movie.vote_average && parseFloat(movie.vote_average).toFixed(1)}
           </Typography>
-          <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
+          <StarIcon width="12" height="12" />
         </Typography>
         <IconButton
           className="play-button"
@@ -191,20 +190,14 @@ const PosterCardContent = ({
             position: "absolute",
             top: "41%",
             left: "48%",
-            color: "white",
+            color: themeDarkMode.title,
             display: "none",
-            transitionDuration: "1s",
-            transitionTimingFunction: "cubic-bezier(.4,0,.2,1)",
+            transition: "all 0.3s",
+            p: 2,
+            borderRadius: "9999px",
           }}>
-          <PlayArrow
-            sx={{
-              backgroundImage: "linear-gradient(to bottom right,#5179ff,#c353b4)",
-              padding: 2,
-              borderRadius: "inherit",
-            }}
-          />
+          <PlayArrowIcon />
         </IconButton>
-
         <ButtonNavPoster swiperRef={swiperRef} isLastSlide={isLastSlide} isFirstSlide={isFirstSlide} />
       </CardContent>
     </>

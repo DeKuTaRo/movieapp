@@ -81,7 +81,7 @@ const PersonDetail = () => {
           xs: "column",
           lg: "row",
         },
-        color: "white",
+        color: themeDarkMode.title,
         gap: 2,
         height: "100vh",
         overflowY: "hidden",
@@ -314,7 +314,7 @@ const PersonDetail = () => {
                     sx={{
                       display: "flex",
                       backgroundColor: themeDarkMode.backgroundSidebar,
-                      color: "white",
+                      color: themeDarkMode.title,
                       width: "100%",
                       cursor: "pointer",
                       "&:hover": {

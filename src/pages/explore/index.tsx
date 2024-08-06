@@ -19,19 +19,14 @@ import {
   Tab,
   Link,
 } from "@mui/material";
-import { SearchIcon } from "../../components/icons";
-import { Star } from "@mui/icons-material";
-
+import { SearchIcon, StarIcon, ArrowDownIcon } from "../../components/icons";
 import { useLocation, useNavigate } from "react-router-dom";
-
 import axios from "axios";
 import { GenresData, MovieDataType } from "../../assets/data";
-
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { themeDarkMode } from "../../themes/ThemeProvider";
 import SidebarShorten from "../../components/sidebar/sidebarShorten";
 import { headers } from "../../utils";
@@ -56,9 +51,9 @@ const MovieItem: React.FC<{ movie: MovieDataType; typeFilm: number }> = ({ movie
             <img
               src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
               alt={movie.title}
-              style={{ width: "100%", height: "100%", borderRadius: "8px" }}
+              style={{ height: 250, borderRadius: "0.5rem" }}
             />
-            <Typography aria-label="movie rating" padding={0} textAlign={"center"}>
+            <Typography variant="subtitle2" aria-label="movie rating" textAlign="center" noWrap>
               {movie.title}
             </Typography>
             <Typography
@@ -83,7 +78,7 @@ const MovieItem: React.FC<{ movie: MovieDataType; typeFilm: number }> = ({ movie
                 }}>
                 {movie.vote_average && parseFloat(movie.vote_average).toFixed(1)}
               </Typography>
-              <Star sx={{ width: "0.75rem", height: "0.75rem" }} />
+              <StarIcon width="12" height="12" />
             </Typography>
           </CardContent>
         </Card>
@@ -158,7 +153,9 @@ const Explore = () => {
 
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [isContinueFetch, setIsContinueFetch] = useState(false);
   const observer = useRef<IntersectionObserver | null>(null);
+
   const lastMovieElementRef = useCallback(
     (node: HTMLElement | null) => {
       if (loading) return;
@@ -166,6 +163,7 @@ const Explore = () => {
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
           setPage((prevPage) => prevPage + 1);
+          setIsContinueFetch(true);
         }
       });
       if (node) observer.current.observe(node);
@@ -322,265 +320,298 @@ const Explore = () => {
         color: themeDarkMode.title,
         gap: 2,
         height: "100vh",
-        overflowY: "scroll",
-        overflowX: "hidden",
       }}>
       <SidebarShorten />
 
-      <Box sx={{ width: "100%", padding: "2rem" }}>
-        <Box sx={{ display: "flex" }}>
-          <Typography variant="h3" sx={{ width: "75%" }}>
-            Find films that best fit to you
-          </Typography>
-          <InputBase
-            placeholder="Search here ..."
-            sx={{
-              mx: 1,
-              flex: 1,
-              color: "white",
-              border: "1px solid #ccc",
-              borderRadius: "1rem",
-              px: 1,
-            }}
-            startAdornment={
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            }
-          />
-        </Box>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={typeFilms}
-            onChange={handleChange}
-            aria-label="tab type movies"
-            sx={{
-              "& .MuiTab-root": { color: themeDarkMode.title },
-              "& .Mui-selected": { color: `${themeDarkMode.textPrimary} !important` },
-              "& .MuiTabs-indicator": { backgroundColor: themeDarkMode.textPrimary },
-            }}>
-            <Tab label="Movie" {...a11yProps(0)} />
-            <Tab label="TV Series" {...a11yProps(1)} />
-          </Tabs>
-        </Box>
-        <CustomTabPanel value={typeFilms} index={0}>
-          {loading ? (
-            <Grid container spacing={1} columns={15} sx={{ marginLeft: "0.5rem" }}>
-              {Array.from({ length: 10 }).map((_, index) => (
-                <Grid item xs={3} key={index} sx={{ marginTop: "2rem", marginBottom: "2rem" }}>
-                  <CustomSkeleton variant="rounded" width={197} height={240} />
+      <Box sx={{ width: "100%", py: 4, px: 2, display: "flex", overflowY: "scroll", overFlowX: "hidden", gap: 1.5 }}>
+        <Grid container spacing={1}>
+          <Grid item xs={9}>
+            <Box sx={{ display: "flex" }}>
+              <Typography variant="h3" sx={{ width: "75%" }}>
+                Find films that best fit to you
+              </Typography>
+              <InputBase
+                placeholder="Search here ..."
+                sx={{
+                  mx: 1,
+                  flex: 1,
+                  color: themeDarkMode.title,
+                  border: `1px solid ${themeDarkMode.textColor}`,
+                  borderRadius: "1rem",
+                  px: 1,
+                }}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                }
+              />
+            </Box>
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Tabs
+                value={typeFilms}
+                onChange={handleChange}
+                aria-label="tab type movies"
+                sx={{
+                  "& .MuiTab-root": { color: themeDarkMode.title },
+                  "& .Mui-selected": { color: `${themeDarkMode.textPrimary} !important` },
+                  "& .MuiTabs-indicator": { backgroundColor: themeDarkMode.textPrimary },
+                }}>
+                <Tab label="Movie" {...a11yProps(0)} />
+                <Tab label="TV Series" {...a11yProps(1)} />
+              </Tabs>
+            </Box>
+            <CustomTabPanel value={typeFilms} index={0}>
+              {loading && !isContinueFetch ? (
+                <Grid container spacing={1} columns={15} sx={{ marginLeft: "0.5rem" }}>
+                  {Array.from({ length: 10 }).map((_, index) => (
+                    <Grid item xs={3} key={index} sx={{ marginTop: "2rem", marginBottom: "2rem" }}>
+                      <CustomSkeleton variant="rounded" width={150} height={250} />
+                    </Grid>
+                  ))}
                 </Grid>
-              ))}
-            </Grid>
-          ) : (
-            <Grid container spacing={1} columns={15}>
-              {listsMovieSearch.map((movie, index) => (
-                <Grid
-                  item
-                  xs={3}
-                  key={movie.id}
-                  ref={index === listsMovieSearch.length - 1 ? lastMovieElementRef : null}>
-                  <MovieItem movie={movie} typeFilm={0} />
+              ) : (
+                <Grid container spacing={1} columns={15}>
+                  {listsMovieSearch.map((movie, index) => (
+                    <Grid
+                      item
+                      xs={3}
+                      key={movie.id}
+                      ref={index === listsMovieSearch.length - 1 ? lastMovieElementRef : null}>
+                      <MovieItem movie={movie} typeFilm={0} />
+                    </Grid>
+                  ))}
                 </Grid>
-              ))}
-            </Grid>
-          )}
-        </CustomTabPanel>
-        <CustomTabPanel value={typeFilms} index={1}>
-          {loading ? (
-            <Grid container spacing={1} columns={15} sx={{ marginLeft: "0.5rem" }}>
-              {Array.from({ length: 10 }).map((_, index) => (
-                <Grid item xs={3} key={index} sx={{ marginTop: "2rem", marginBottom: "2rem" }}>
-                  <CustomSkeleton variant="rounded" width={197} height={240} />
+              )}
+            </CustomTabPanel>
+            <CustomTabPanel value={typeFilms} index={1}>
+              {loading && !isContinueFetch ? (
+                <Grid container spacing={1} columns={15} sx={{ marginLeft: "0.5rem" }}>
+                  {Array.from({ length: 10 }).map((_, index) => (
+                    <Grid item xs={3} key={index} sx={{ marginTop: "2rem", marginBottom: "2rem" }}>
+                      <CustomSkeleton variant="rounded" width={197} height={240} />
+                    </Grid>
+                  ))}
                 </Grid>
-              ))}
-            </Grid>
-          ) : (
-            <Grid container spacing={1} columns={15}>
-              {listsTVShowSearch.map((movie, index) => (
-                <Grid
-                  item
-                  xs={3}
-                  key={movie.id}
-                  ref={index === listsTVShowSearch.length - 1 ? lastMovieElementRef : null}>
-                  <MovieItem movie={movie} typeFilm={1} />
+              ) : (
+                <Grid container spacing={1} columns={15}>
+                  {listsTVShowSearch.map((movie, index) => (
+                    <Grid
+                      item
+                      xs={3}
+                      key={movie.id}
+                      ref={index === listsMovieSearch.length - 1 ? lastMovieElementRef : null}>
+                      <MovieItem movie={movie} typeFilm={1} />
+                    </Grid>
+                  ))}
                 </Grid>
-              ))}
-            </Grid>
-          )}
-        </CustomTabPanel>
-      </Box>
-
-      {/* Sidebar Right */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: {
-            xs: "row",
-            lg: "column",
-          },
-          gap: 2,
-          width: {
-            sm: "100%",
-            lg: 450,
-          },
-          mt: 4,
-          mr: 4,
-        }}>
-        {/* Sort */}
-        <Box sx={{ backgroundColor: themeDarkMode.backgroundSidebar, padding: 2, borderRadius: 2 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h2>Sort</h2>
-            <Button
-              startIcon={<KeyboardArrowDownIcon />}
-              sx={{ color: "white" }}
-              onClick={() => setSortCollapse((prev) => !prev)}
-            />
-          </Box>
-          {/* Sort collapse */}
-          <Collapse in={sortCollapse}>
-            <h2>Sort results by</h2>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              fullWidth
-              onChange={handleChangeSortSearch}
-              sx={{
-                color: themeDarkMode.title,
-                backgroundColor: themeDarkMode.backgroundSidebar,
-                borderRadius: 2,
-                border: `1px solid ${themeDarkMode.title}`,
-              }}
-              defaultValue="popularity.desc">
-              <MenuItem value="popularity.desc">Most popular</MenuItem>
-              <MenuItem value="vote_average.desc">Most rating</MenuItem>
-              <MenuItem value="release_date.desc">Most recent</MenuItem>
-            </Select>
-          </Collapse>
-        </Box>
-
-        {/* Filter */}
-        <Box sx={{ backgroundColor: themeDarkMode.backgroundSidebar, padding: 2, borderRadius: 2 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h2>Filter</h2>
-            <Button
-              startIcon={<KeyboardArrowDownIcon />}
-              sx={{ color: "white" }}
-              onClick={() => setFilterCollapse((prev) => !prev)}
-            />
-          </Box>
-
-          {/* Filter collapse */}
-          <Collapse in={filterCollapse}>
-            <h4>Genres</h4>
+              )}
+            </CustomTabPanel>
+          </Grid>
+          <Grid item xs={3}>
+            {/* Sidebar Right */}
             <Box
               sx={{
                 display: "flex",
-                flexWrap: "wrap",
+                flexDirection: {
+                  xs: "row",
+                  lg: "column",
+                },
                 gap: 2,
-                overflowY: "scroll",
-                maxHeight: "200px",
-                padding: "1rem",
+
+                // mt: 4,
+                // mr: 4,
               }}>
-              {(typeFilms === 0 ? genresMovieData : genresTVData).map((genre) => {
-                return (
+              {/* Sort */}
+              <Box sx={{ backgroundColor: themeDarkMode.backgroundSidebar, padding: 2, borderRadius: 2 }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <Typography
-                    key={genre.id}
+                    variant="h5"
                     sx={{
-                      backgroundColor: selectedGenres.includes(genre.id)
-                        ? themeDarkMode.textPrimary
-                        : themeDarkMode.backgroundSidebar,
-                      padding: "0.5rem",
-                      borderRadius: "1rem",
-                      border: `1px solid ${themeDarkMode.title}`,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleChangeGenresSearch(genre.id)}>
-                    {genre.name}
+                      fontWeight: "bold",
+                    }}>
+                    Sort
                   </Typography>
-                );
-              })}
-            </Box>
-            {/* Run time */}
-            <h4>Run time</h4>
-            <Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <h5>From {runTime[0]} min</h5>
-                <h5>To {runTime[1]} min</h5>
+                  <Button
+                    startIcon={<ArrowDownIcon />}
+                    sx={{ color: "white" }}
+                    onClick={() => setSortCollapse((prev) => !prev)}
+                  />
+                </Box>
+                {/* Sort collapse */}
+                <Collapse in={sortCollapse} sx={{ px: 1.5 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Sort results by
+                  </Typography>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    fullWidth
+                    onChange={handleChangeSortSearch}
+                    sx={{
+                      color: themeDarkMode.title,
+                      backgroundColor: themeDarkMode.backgroundSidebar,
+                      borderRadius: 2,
+                      border: `1px solid ${themeDarkMode.title}`,
+                    }}
+                    defaultValue="popularity.desc">
+                    <MenuItem value="popularity.desc">Most popular</MenuItem>
+                    <MenuItem value="vote_average.desc">Most rating</MenuItem>
+                    <MenuItem value="release_date.desc">Most recent</MenuItem>
+                  </Select>
+                </Collapse>
               </Box>
-              <Slider
-                value={runTime}
-                onChangeCommitted={handleChangeCommitted}
-                onChange={handleChangeRunTimeSearch}
-                valueLabelDisplay="off"
-                aria-labelledby="range-slider"
-                disableSwap
-                marks={[]}
-                step={10}
-                min={0}
-                max={200}
-                sx={{
-                  "& .MuiSlider-rail": {
-                    backgroundColor: "black",
-                  },
-                  "& .MuiSlider-track": {
-                    backgroundColor: themeDarkMode.textPrimary,
-                  },
-                  "& .MuiSlider-thumb": {
-                    backgroundColor: themeDarkMode.textPrimary,
-                  },
-                  maxWidth: "96%",
-                  margin: "0 0.5rem",
-                  padding: "0.5rem 0",
-                }}
-              />
-            </Box>
-            {/* Realease date */}
-            <h4>Realease date</h4>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>From </div>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    value={selectedFromDate}
-                    onChange={handleFromDateChange}
-                    slotProps={{
-                      textField: {
-                        sx: {
-                          backgroundColor: "gray",
-                          borderRadius: "0.5rem",
-                          "& .MuiInputBase-input": {
-                            color: "white",
-                          },
-                        },
+
+              {/* Filter */}
+              <Box sx={{ backgroundColor: themeDarkMode.backgroundSidebar, padding: 2, borderRadius: 2 }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: "bold",
+                      width: "fit-content",
+                    }}>
+                    Filter
+                  </Typography>
+                  <Button
+                    startIcon={<ArrowDownIcon />}
+                    sx={{ color: "white" }}
+                    onClick={() => setFilterCollapse((prev) => !prev)}
+                  />
+                </Box>
+
+                {/* Filter collapse */}
+                <Collapse in={filterCollapse} sx={{ px: 1.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Genres
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 2,
+                      overflowY: "scroll",
+                      maxHeight: "200px",
+                      mb: 1,
+                    }}>
+                    {(typeFilms === 0 ? genresMovieData : genresTVData).map((genre) => {
+                      return (
+                        <Typography
+                          key={genre.id}
+                          sx={{
+                            backgroundColor: selectedGenres.includes(genre.id)
+                              ? themeDarkMode.textPrimary
+                              : themeDarkMode.backgroundSidebar,
+                            padding: "0.5rem",
+                            borderRadius: "1rem",
+                            border: `1px solid ${themeDarkMode.title}`,
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleChangeGenresSearch(genre.id)}>
+                          {genre.name}
+                        </Typography>
+                      );
+                    })}
+                  </Box>
+                  {/* Run time */}
+                  <Typography variant="h6" gutterBottom>
+                    Run time
+                  </Typography>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", px: 1.5 }}>
+                    <Typography variant="body2" gutterBottom>
+                      From {runTime[0]} min
+                    </Typography>
+                    <Typography variant="body2" gutterBottom>
+                      To {runTime[1]} min
+                    </Typography>
+                  </Box>
+                  <Slider
+                    value={runTime}
+                    onChangeCommitted={handleChangeCommitted}
+                    onChange={handleChangeRunTimeSearch}
+                    valueLabelDisplay="off"
+                    aria-labelledby="range-slider"
+                    disableSwap
+                    marks={[]}
+                    step={10}
+                    min={0}
+                    max={200}
+                    sx={{
+                      "& .MuiSlider-rail": {
+                        backgroundColor: "black",
                       },
+                      "& .MuiSlider-track": {
+                        backgroundColor: themeDarkMode.textPrimary,
+                      },
+                      "& .MuiSlider-thumb": {
+                        backgroundColor: themeDarkMode.textPrimary,
+                      },
+                      maxWidth: "96%",
+                      margin: "0 0.5rem",
+                      padding: "0.5rem 0",
                     }}
                   />
-                </LocalizationProvider>
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>To </div>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    value={selectedToDate}
-                    onChange={handleToDateChange}
-                    slotProps={{
-                      textField: {
-                        sx: {
-                          backgroundColor: "gray",
-                          borderRadius: "0.5rem",
-                          "& .MuiInputBase-input": {
-                            color: "white",
-                          },
-                        },
-                      },
-                    }}
-                  />
-                </LocalizationProvider>
+                  {/* Realease date */}
+                  <Typography variant="h6" gutterBottom>
+                    Realease date
+                  </Typography>
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    <Grid container spacing={1.5} sx={{ alignItems: "center" }}>
+                      <Grid item xs={2}>
+                        <Typography variant="body2" gutterBottom>
+                          From
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={10}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker
+                            value={selectedFromDate}
+                            onChange={handleFromDateChange}
+                            slotProps={{
+                              textField: {
+                                sx: {
+                                  backgroundColor: themeDarkMode.textColor,
+                                  borderRadius: "0.5rem",
+                                  "& .MuiInputBase-input": {
+                                    color: themeDarkMode.title,
+                                  },
+                                },
+                              },
+                            }}
+                          />
+                        </LocalizationProvider>
+                      </Grid>
+                      <Grid item xs={2}>
+                        <Typography variant="body2" gutterBottom>
+                          To
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={10}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker
+                            value={selectedToDate}
+                            onChange={handleToDateChange}
+                            slotProps={{
+                              textField: {
+                                sx: {
+                                  backgroundColor: themeDarkMode.textColor,
+                                  borderRadius: "0.5rem",
+                                  "& .MuiInputBase-input": {
+                                    color: themeDarkMode.title,
+                                  },
+                                },
+                              },
+                            }}
+                          />
+                        </LocalizationProvider>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Collapse>
               </Box>
             </Box>
-          </Collapse>
-        </Box>
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   );

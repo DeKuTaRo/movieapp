@@ -5,5 +5,6 @@ export const themeDarkMode = {
   textColorItemActiveSidebar: "#8e71cd",
   title: "#fff",
   textPrimary: "#5179ff",
-  textColorHelperForm : "#dc5959"
+  textColorHelperForm: "#dc5959",
+  starRatingColor: "#ffff00",
 };
