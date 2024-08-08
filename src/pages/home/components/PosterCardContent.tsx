@@ -196,7 +196,7 @@ const PosterCardContent = ({
             p: 2,
             borderRadius: "9999px",
           }}>
-          <PlayArrowIcon />
+          <PlayArrowIcon includeBackgroundColor={true} />
         </IconButton>
         <ButtonNavPoster swiperRef={swiperRef} isLastSlide={isLastSlide} isFirstSlide={isFirstSlide} />
       </CardContent>

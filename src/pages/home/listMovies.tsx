@@ -83,15 +83,15 @@ const ListMovies = ({
         spaceBetween={type === "poster" ? 50 : 20}
         slidesPerView={type === "poster" ? 1 : 6}
         loop={type === "poster" ? true : true}
-        // autoplay={
-        //   type === "poster"
-        //     ? {
-        //         delay: 3000,
-        //         disableOnInteraction: false,
-        //         pauseOnMouseEnter: true,
-        //       }
-        //     : undefined
-        // }
+        autoplay={
+          type === "poster"
+            ? {
+                delay: 3000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              }
+            : undefined
+        }
         onSlideChange={(swiper: SwiperClass) => handleSlideChange(swiper)}
         onSwiper={(swiper: SwiperClass) => {
           swiperRef.current = swiper;
