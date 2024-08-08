@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { RouterProvider, useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { RouterProvider } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, onSnapshot } from "firebase/firestore";
 import { useAppDispatch } from "./hooks";

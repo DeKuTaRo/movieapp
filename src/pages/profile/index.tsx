@@ -17,6 +17,8 @@ import {
   signOut,
   updatePassword,
 } from "firebase/auth";
+import toast from "react-hot-toast";
+import { convertErrorCodeToMessage } from "../../utils";
 
 const validateEmail = (email: string) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -71,24 +73,15 @@ const Profile = () => {
       return;
     }
 
-    console.log("email = ", defaultUpdateUser.email);
-
     if (checkAuthUser && checkAuthUser.email) {
       try {
         const credential = EmailAuthProvider.credential(checkAuthUser.email, "123456");
         await reauthenticateWithCredential(checkAuthUser, credential);
         await updateEmail(checkAuthUser, defaultUpdateUser.email);
-        console.log("update email successfully");
+        toast.success("Update successfully");
       } catch (err: any) {
-        console.log("Error: ", err);
-        if (err.code === "auth/requires-recent-login") {
-          setEmailError("Please log in again to update your email.");
-        } else {
-          setEmailError(err.message);
-        }
+        toast.error(convertErrorCodeToMessage(err.code));
       }
-    } else {
-      console.log("No user is currently signed in.");
     }
   };
 
@@ -108,9 +101,9 @@ const Profile = () => {
     if (checkAuthUser) {
       try {
         await sendEmailVerification(checkAuthUser);
-        console.log("Email sent successfully");
-      } catch (err) {
-        console.log("err = ", err);
+        toast.success("Check you email account to verify");
+      } catch (err: any) {
+        toast.error(convertErrorCodeToMessage(err.code));
       }
     }
   };
@@ -118,10 +111,11 @@ const Profile = () => {
   const handleSignOut = async () => {
     await signOut(auth)
       .then(() => {
+        toast.success("Hope to see you again!!!");
         navigate("/");
       })
-      .catch((error: any) => {
-        console.log("err = ", error);
+      .catch((err: any) => {
+        toast.error(convertErrorCodeToMessage(err.code));
       });
   };
 
@@ -153,9 +147,9 @@ const Profile = () => {
           lastName: "",
         }));
         setIsUpdateName(false);
-        console.log("update successfully ");
-      } catch (err) {
-        console.log("err update name = ", err);
+        toast.success("Update successfully");
+      } catch (err: any) {
+        toast.error(convertErrorCodeToMessage(err.code));
       }
     }
   };
@@ -166,18 +160,15 @@ const Profile = () => {
       await reauthenticateWithCredential(checkAuthUser, credential);
       await updatePassword(checkAuthUser, defaultUpdateUser.newPassword)
         .then(() => {
-          // Update successful.
-          console.log("Update password successfully");
           setOpenModalAuthenticate(false);
           setDefaultUpdateUser((prevState) => ({
             ...prevState,
             newPassword: "",
           }));
+          toast.success("Update successfully");
         })
-        .catch((error: any) => {
-          console.log("err = ", error);
-          // An error ocurred
-          // ...
+        .catch((err: any) => {
+          toast.error(convertErrorCodeToMessage(err.code));
         });
     }
   };
