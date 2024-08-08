@@ -4,6 +4,7 @@ import { themeDarkMode } from "../../themes/ThemeProvider";
 import { HomeIcon, ExploreIcon, SearchIcon, BookmarkedIcon, HistoryIcon, ProfileIcon, LoginIcon } from "../icons";
 import { useAppSelector } from "../../hooks";
 import { Logo } from "../../assets";
+import toast from "react-hot-toast";
 
 const navLinks = [
   {
@@ -76,10 +77,25 @@ const Sidebar = ({ page }: SidebarProps) => {
   const showToastRequireLogin = (event: React.MouseEvent<HTMLAnchorElement>, link: string) => {
     if (!currentUser && ["/bookmarked", "/history", "/profile"].includes(link)) {
       event.preventDefault();
-      alert("You must log in to use this feature.");
+      toast.error("You must log in to use this feature.");
     } else if (currentUser && link === "/history") {
       event.preventDefault();
-      alert("This feature is updating");
+      toast("This feature is updating", {
+        icon: "🚧",
+        style: {
+          background: themeDarkMode.textPrimary,
+          color: themeDarkMode.title,
+        },
+      });
+    } else if (currentUser && link === "/login") {
+      event.preventDefault();
+      toast("You have already logged in", {
+        icon: "🔒",
+        style: {
+          background: themeDarkMode.starRatingColor,
+          color: themeDarkMode.backgroundColor,
+        },
+      });
     }
   };
 
