@@ -216,7 +216,10 @@ const Profile = () => {
                       <SendIcon />
                     </IconButton>
                   ) : (
-                    <IconButton aria-label="edit-email" onClick={() => setIsUpdateEmail(true)}>
+                    <IconButton
+                      aria-label="edit-email"
+                      sx={{ color: themeDarkMode.title }}
+                      onClick={() => setIsUpdateEmail(true)}>
                       <EditIcon />
                     </IconButton>
                   )}
@@ -261,7 +264,10 @@ const Profile = () => {
                       <SendIcon />
                     </IconButton>
                   ) : (
-                    <IconButton aria-label="edit-email" onClick={() => setIsUpdateName(true)}>
+                    <IconButton
+                      aria-label="edit-email"
+                      sx={{ color: themeDarkMode.title }}
+                      onClick={() => setIsUpdateName(true)}>
                       <EditIcon />
                     </IconButton>
                   )}

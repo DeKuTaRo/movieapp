@@ -5,6 +5,7 @@ import { HomeIcon, ExploreIcon, SearchIcon, BookmarkedIcon, HistoryIcon, Profile
 import { GirlBackground, Logo } from "../../assets";
 import { useAppSelector } from "../../hooks";
 import toast from "react-hot-toast";
+import { TooltipCustom } from "../ToolTip";
 
 const customSizeIcon = {
   width: "25",
@@ -141,31 +142,37 @@ const SidebarShorten = () => {
           lg: 40,
         },
       }}>
-      <Link href="/" underline="none">
-        <Avatar alt="Logo" src={Logo} sx={{ width: 25, height: 25 }} />
-      </Link>
+      <TooltipCustom title="Home">
+        <Link href="/" underline="none">
+          <Avatar alt="Logo" src={Logo} sx={{ width: 25, height: 25 }} />
+        </Link>
+      </TooltipCustom>
       <Box sx={{ gap: 3, display: "flex", flexDirection: "column" }}>
         {navLinks.map((item) => (
-          <Link
-            key={item.name}
-            href={item.link}
-            onClick={(event) => showToastRequireLogin(event, item.link)}
-            style={{ textDecoration: "none" }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                textDecoration: "none",
-              }}>
-              {location.pathname === item.link ? item.activeIcon : item.icon}
-            </Box>
-          </Link>
+          <TooltipCustom title={item.name}>
+            <Link
+              key={item.name}
+              href={item.link}
+              onClick={(event) => showToastRequireLogin(event, item.link)}
+              style={{ textDecoration: "none" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  textDecoration: "none",
+                }}>
+                {location.pathname === item.link ? item.activeIcon : item.icon}
+              </Box>
+            </Link>
+          </TooltipCustom>
         ))}
       </Box>
-      <Link href="/profile" underline="none">
-        <Avatar alt="" src={GirlBackground} sx={{ width: 25, height: 25 }} />
-      </Link>
+      <TooltipCustom title="Profile" >
+        <Link href="/profile" underline="none">
+          <Avatar alt="" src={GirlBackground} sx={{ width: 25, height: 25 }} />
+        </Link>
+      </TooltipCustom>
     </Box>
   );
 };
