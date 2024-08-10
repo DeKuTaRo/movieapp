@@ -19,6 +19,7 @@ import {
 } from "firebase/auth";
 import toast from "react-hot-toast";
 import { convertErrorCodeToMessage } from "../../utils";
+import CustomSkeleton from "../../components/Skeleton";
 
 const validateEmail = (email: string) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -201,13 +202,13 @@ const Profile = () => {
                 Here you can edit public information about yourself. <br />
                 If you signed in with Google or Facebook, you can't change your email and password.
               </Typography>
-              <Typography variant="h5" component="h1" my={3} sx={{ fontWeight: "bold" }}>
+              <Typography variant="h5" component="h1" mt={3} sx={{ fontWeight: "bold" }}>
                 Email
               </Typography>
               <Grid container spacing={1} sx={{ alignItems: "center" }}>
                 <Grid item xs={10}>
                   <Typography variant="h6" component="h1" my={3} color={themeDarkMode.textColor}>
-                    {currentUser?.email}
+                    {currentUser ? currentUser.email : <CustomSkeleton variant="text" />}
                   </Typography>
                 </Grid>
                 <Grid item xs={2}>
@@ -249,13 +250,13 @@ const Profile = () => {
                 )}
               </Grid>
 
-              <Typography variant="h5" component="h1" my={3} sx={{ fontWeight: "bold" }}>
+              <Typography variant="h5" component="h1"  sx={{ fontWeight: "bold" }}>
                 Name
               </Typography>
               <Grid container spacing={1} sx={{ alignItems: "center" }}>
                 <Grid item xs={10}>
                   <Typography variant="h6" component="h1" my={3} color={themeDarkMode.textColor}>
-                    {currentUser?.displayName}
+                    {currentUser ? currentUser.displayName : <CustomSkeleton variant="text" />}
                   </Typography>
                 </Grid>
                 <Grid item xs={2}>
@@ -313,7 +314,7 @@ const Profile = () => {
               <Typography
                 variant="h5"
                 component="h1"
-                my={3}
+                mb={3}
                 align="left"
                 sx={{ fontWeight: "bold", display: "flex", justifyContent: "space-between" }}>
                 Your email is {currentUser?.emailVerified ? "verified" : "not verified"}.
@@ -323,7 +324,7 @@ const Profile = () => {
                   </Button>
                 )}
               </Typography>
-              <Grid container spacing={1} sx={{ alignItems: "center" }}>
+              <Grid container rowSpacing={2} columnSpacing={1} sx={{ alignItems: "center" }}>
                 <Grid item xs={10}>
                   <TextFieldCustom
                     id="newPassword"
@@ -348,7 +349,7 @@ const Profile = () => {
                     Delete account
                   </Button>
                 </Grid>
-                <Grid item xs={6} sx={{ textAlign: "center" }}>
+                <Grid item xs={6} sx={{ }}>
                   <Button variant="contained" color="error" onClick={handleSignOut}>
                     Sign out
                   </Button>
