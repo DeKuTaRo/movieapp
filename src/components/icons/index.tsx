@@ -718,3 +718,29 @@ export const LastPageIcon: React.FC<IconProps> = ({ color = themeDarkMode.title,
     </>
   );
 };
+
+export const CloudUploadIcon: React.FC<IconProps> = ({ color = themeDarkMode.title, width = "20", height = "20" }) => {
+  return (
+    <>
+      <svg width={width} height={height} fill={color} focusable="false" aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96M14 13v4h-4v-4H7l5-5 5 5z"></path>
+      </svg>
+    </>
+  );
+};
+
+export const AcceptIcon: React.FC<IconProps> = ({ color = themeDarkMode.title, width = "20", height = "20" }) => {
+  return (
+    <>
+      <svg fill={color} width={width} height={height} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <defs></defs>
+        <path
+          id="accept"
+          fillRule="evenodd"
+          d="M1008,120a12,12,0,1,1,12-12A12,12,0,0,1,1008,120Zm0-22a10,10,0,1,0,10,10A10,10,0,0,0,1008,98Zm-0.08,14.333a0.819,0.819,0,0,1-.22.391,0.892,0.892,0,0,1-.72.259,0.913,0.913,0,0,1-.94-0.655l-2.82-2.818a0.9,0.9,0,0,1,1.27-1.271l2.18,2.184,4.46-7.907a1,1,0,0,1,1.38-.385,1.051,1.051,0,0,1,.36,1.417Z"
+          transform="translate(-996 -96)"
+        />
+      </svg>
+    </>
+  );
+};

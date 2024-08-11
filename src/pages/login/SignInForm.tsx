@@ -9,6 +9,8 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { CredentialsProps } from "../../assets/data";
+import toast from "react-hot-toast";
+import { convertErrorCodeToMessage } from "../../utils";
 
 interface SignInProps {
   setIsSignUp: Dispatch<SetStateAction<boolean>>;
@@ -36,14 +38,12 @@ const SignInForm = ({ setIsSignUp }: SignInProps) => {
 
   const handleSignIn = async (values: typeof formik.values) => {
     await signInWithEmailAndPassword(auth, values.email, values.password)
-      .then((user) => {
-        if (user) {
-          navigate("/");
-        }
-        console.log("user login = ", user);
+      .then(() => {
+        toast.success("Nice to see you again !");
+        navigate("/");
       })
-      .catch((error: any) => {
-        console.log("err = ", error);
+      .catch((err: any) => {
+        toast.error(convertErrorCodeToMessage(err.code));
       });
   };
 

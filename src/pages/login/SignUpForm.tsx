@@ -9,6 +9,8 @@ import { doc, setDoc } from "firebase/firestore";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { CredentialsProps } from "../../assets/data";
+import toast from "react-hot-toast";
+import { convertErrorCodeToMessage } from "../../utils";
 
 interface SignUpProps {
   setIsSignUp: Dispatch<SetStateAction<boolean>>;
@@ -44,9 +46,10 @@ export default function SignUpForm({ setIsSignUp }: SignUpProps) {
         bookmarks: {},
         recentlyWatch: [],
       });
+      toast.success("Welcome to my app! Enjoy and have fun!");
       setIsSignUp(false);
-    } catch (err) {
-      console.log("err = ", err);
+    } catch (err: any) {
+      toast.error(convertErrorCodeToMessage(err.code));
     }
   };
 

@@ -120,6 +120,7 @@ export interface User {
   emailVerified: boolean;
   photoURL: string | null;
   uid: string;
+  signInType: "google" | "facebook" | "email";
 }
 
 export interface CredentialsProps {
@@ -128,6 +129,14 @@ export interface CredentialsProps {
   displayName?: string | null;
   email: string;
   password: string;
+}
+
+export interface CredentialsUpdateProps {
+  firstName: string;
+  lastName: string;
+  email: string;
+  newPassword: string;
+  oldPassword: string;
 }
 
 export interface BookmarkProps {

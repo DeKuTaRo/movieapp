@@ -26,8 +26,9 @@ function App() {
               displayName: doc.data()?.lastName + " " + doc.data()?.firstName || "",
               email: user.email,
               emailVerified: user.emailVerified,
-              photoURL: doc.data()?.photoUrl || "",
+              photoURL: user.photoURL,
               uid: user.uid,
+              signInType: "google",
             })
           );
         });
@@ -38,8 +39,9 @@ function App() {
               displayName: doc.data()?.lastName + " " + doc.data()?.firstName || "",
               email: user.email,
               emailVerified: user.emailVerified,
-              photoURL: doc.data()?.photoUrl || "",
+              photoURL: user.photoURL,
               uid: user.uid,
+              signInType: "facebook",
             })
           );
         });
@@ -48,10 +50,11 @@ function App() {
           dispatch(
             setCurrentUser({
               displayName: doc.data()?.lastName + " " + doc.data()?.firstName || "",
-              photoURL: doc.data()?.photoUrl || "",
+              photoURL: user.photoURL,
               email: user.email,
               emailVerified: user.emailVerified,
               uid: user.uid,
+              signInType: "email",
             })
           );
         });

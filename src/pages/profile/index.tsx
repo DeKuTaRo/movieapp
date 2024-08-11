@@ -8,7 +8,17 @@ import { GirlBackground } from "../../assets";
 import { useAppSelector } from "../../hooks";
 import { auth, db } from "../../firebase";
 import { doc, updateDoc } from "firebase/firestore";
-import { EmailIcon, FirstNameIcon, LastNameIcon, EditIcon, SendIcon, PasswordIcon } from "../../components/icons";
+import {
+  EmailIcon,
+  FirstNameIcon,
+  LastNameIcon,
+  EditIcon,
+  SendIcon,
+  PasswordIcon,
+  CloudUploadIcon,
+  ClearIcon,
+  AcceptIcon,
+} from "../../components/icons";
 import {
   updateEmail,
   sendEmailVerification,
@@ -20,6 +30,11 @@ import {
 import toast from "react-hot-toast";
 import { convertErrorCodeToMessage } from "../../utils";
 import CustomSkeleton from "../../components/Skeleton";
+import { uploadBytes, getDownloadURL, ref } from "firebase/storage";
+import { storage } from "../../firebase";
+import { CredentialsUpdateProps } from "../../assets/data";
+import { styled } from "@mui/material/styles";
+import { updateProfile } from "firebase/auth";
 
 const validateEmail = (email: string) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,13 +45,17 @@ const validatePassword = (password: string) => {
   return password.length < 8;
 };
 
-export interface CredentialsUpdateProps {
-  firstName: string;
-  lastName: string;
-  email: string;
-  newPassword: string;
-  oldPassword: string;
-}
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -174,6 +193,41 @@ const Profile = () => {
     }
   };
 
+  const [avatar, setAvatar] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState<boolean>(false);
+  const handleUploadAvatar = (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files ? e.target.files[0] : null;
+    setAvatar(selectedFile);
+
+    if (selectedFile) {
+      const previewUrl = URL.createObjectURL(selectedFile);
+      setPreview(previewUrl);
+      setIsUploadingAvatar(true);
+    }
+  };
+
+  const handleCancelUploadAvatar = () => {
+    setPreview(null);
+    setIsUploadingAvatar(false);
+  };
+
+  const handleUpdateAvatar = async () => {
+    try {
+      if (checkAuthUser) {
+        const avatarRef = ref(storage, `Avatar/${checkAuthUser.uid}/${avatar?.name}`);
+        const snapshot = await uploadBytes(avatarRef, avatar as Blob);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        await updateProfile(checkAuthUser, { photoURL: downloadURL });
+        setPreview(null);
+        setIsUploadingAvatar(false);
+        toast.success("Update successfully");
+      }
+    } catch (err: any) {
+      toast.error(convertErrorCodeToMessage(err.code));
+    }
+  };
+
   return (
     <>
       <Box
@@ -213,13 +267,16 @@ const Profile = () => {
                 </Grid>
                 <Grid item xs={2}>
                   {isUpdateEmail ? (
-                    <IconButton aria-label="edit-email" onClick={handleUpdateEmail}>
+                    <IconButton aria-label="update-email" onClick={handleUpdateEmail}>
                       <SendIcon />
                     </IconButton>
                   ) : (
                     <IconButton
                       aria-label="edit-email"
                       sx={{ color: themeDarkMode.title }}
+                      disabled={
+                        currentUser?.signInType === "google" || currentUser?.signInType === "facebook" ? true : false
+                      }
                       onClick={() => setIsUpdateEmail(true)}>
                       <EditIcon />
                     </IconButton>
@@ -250,7 +307,7 @@ const Profile = () => {
                 )}
               </Grid>
 
-              <Typography variant="h5" component="h1"  sx={{ fontWeight: "bold" }}>
+              <Typography variant="h5" component="h1" sx={{ fontWeight: "bold" }}>
                 Name
               </Typography>
               <Grid container spacing={1} sx={{ alignItems: "center" }}>
@@ -261,12 +318,12 @@ const Profile = () => {
                 </Grid>
                 <Grid item xs={2}>
                   {isUpdateName ? (
-                    <IconButton aria-label="edit-email" onClick={handleUpdateName}>
+                    <IconButton aria-label="update-name" onClick={handleUpdateName}>
                       <SendIcon />
                     </IconButton>
                   ) : (
                     <IconButton
-                      aria-label="edit-email"
+                      aria-label="edit-name"
                       sx={{ color: themeDarkMode.title }}
                       onClick={() => setIsUpdateName(true)}>
                       <EditIcon />
@@ -325,31 +382,35 @@ const Profile = () => {
                 )}
               </Typography>
               <Grid container rowSpacing={2} columnSpacing={1} sx={{ alignItems: "center" }}>
-                <Grid item xs={10}>
-                  <TextFieldCustom
-                    id="newPassword"
-                    name="newPassword"
-                    type="password"
-                    value={defaultUpdateUser.newPassword}
-                    onChange={handleUpdateUserDetail}
-                    error={Boolean(newPasswordError)}
-                    helperText={newPasswordError}
-                    helperTextColor={themeDarkMode.textColorHelperForm}
-                    iconEnd={<PasswordIcon />}
-                    placeholder="Enter new password here"
-                  />
-                </Grid>
-                <Grid item xs={2}>
-                  <IconButton aria-label="edit-email" onClick={handleCheckValidNewPassword}>
-                    <SendIcon />
-                  </IconButton>
-                </Grid>
+                {currentUser?.signInType === "google" || currentUser?.signInType === "facebook" ? undefined : (
+                  <>
+                    <Grid item xs={10}>
+                      <TextFieldCustom
+                        id="newPassword"
+                        name="newPassword"
+                        type="password"
+                        value={defaultUpdateUser.newPassword}
+                        onChange={handleUpdateUserDetail}
+                        error={Boolean(newPasswordError)}
+                        helperText={newPasswordError}
+                        helperTextColor={themeDarkMode.textColorHelperForm}
+                        iconEnd={<PasswordIcon />}
+                        placeholder="Enter new password here"
+                      />
+                    </Grid>
+                    <Grid item xs={2}>
+                      <IconButton aria-label="edit-email" onClick={handleCheckValidNewPassword}>
+                        <SendIcon />
+                      </IconButton>
+                    </Grid>
+                  </>
+                )}
                 <Grid item xs={6} sx={{ textAlign: "center" }}>
                   <Button variant="contained" color="error">
                     Delete account
                   </Button>
                 </Grid>
-                <Grid item xs={6} sx={{ }}>
+                <Grid item xs={6}>
                   <Button variant="contained" color="error" onClick={handleSignOut}>
                     Sign out
                   </Button>
@@ -368,8 +429,36 @@ const Profile = () => {
                   flexDirection: "column",
                   gap: 5,
                 }}>
-                <Avatar alt="Remy Sharp" src={GirlBackground} sx={{ width: 300, height: 300 }} />
-                <Button variant="contained">Upload avatar here</Button>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  {isUploadingAvatar && (
+                    <IconButton
+                      aria-label="cancel-avatar"
+                      sx={{ color: themeDarkMode.title, height: "fit-content" }}
+                      onClick={handleCancelUploadAvatar}>
+                      <ClearIcon />
+                    </IconButton>
+                  )}
+                  <Avatar
+                    alt="Remy Sharp"
+                    src={preview || (currentUser?.photoURL ? `${currentUser?.photoURL}` : GirlBackground)}
+                    sx={{ width: 300, height: 300 }}
+                  />
+                  {isUploadingAvatar && (
+                    <IconButton aria-label="update-avatar" sx={{ height: "fit-content" }} onClick={handleUpdateAvatar}>
+                      <AcceptIcon />
+                    </IconButton>
+                  )}
+                </Box>
+
+                <Button
+                  component="label"
+                  role={undefined}
+                  variant="contained"
+                  tabIndex={-1}
+                  startIcon={<CloudUploadIcon />}>
+                  Upload avatar
+                  <VisuallyHiddenInput type="file" accept="image/*" onChange={handleUploadAvatar} />
+                </Button>
               </Box>
               <Typography variant="h5" component="h1" my={3} align="center" sx={{ fontWeight: "bold" }}>
                 {currentUser?.displayName}
